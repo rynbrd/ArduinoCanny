@@ -1,5 +1,5 @@
-#ifndef _CANBED_CAN_H_
-#define _CANBED_CAN_H_
+#ifndef _CANBED_CONTROLLER_H_
+#define _CANBED_CONTROLLER_H_
 
 #include <Arduino.h>
 
@@ -128,4 +128,4 @@ class Controller {
 
 }
 
-#endif  // _CANBED_CAN_H_
+#endif  // _CANBED_CONTROLLER_H_
