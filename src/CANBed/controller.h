@@ -72,10 +72,10 @@ enum Error : uint8_t {
 };
 
 // Base class for all CAN controllers.
-class CAN {
+class Controller {
     public:
-        CAN() = default;
-        virtual ~CAN() = default;
+        Controller() = default;
+        virtual ~Controller() = default;
 
         // Initialize the controller. The controller must be connected to a bus
         // that supports the provided bitrate. CAN 2.0 controllers only support

@@ -1,7 +1,7 @@
 #ifndef _CANBED_UTIL_H_
 #define _CANBED_UTIL_H_
 
-#include "can.h"
+#include "controller.h"
 
 namespace CANBed {
 namespace internal {

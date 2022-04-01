@@ -71,21 +71,21 @@ uint32_t GetSAME51Bitrate(Bitrate bitrate) {
 
 }  // namespace
 
-bool CANSAME51::begin(Bitrate bitrate) {
+bool SAME51::begin(Bitrate bitrate) {
     bitrate_ = GetFixedBitrate(bitrate);
     mode_ = internal::GetMode(bitrate_);
     return same51_.begin(MCP_ANY, GetSAME51Bitrate(bitrate_), MCAN_MODE_CAN) == CAN_OK;
 }
 
-Mode CANSAME51::mode() const {
+Mode SAME51::mode() const {
     return mode_;
 }
 
-Bitrate CANSAME51::bitrate() const {
+Bitrate SAME51::bitrate() const {
     return bitrate_;
 }
 
-Error CANSAME51::read(uint32_t* id, uint8_t* ext, uint8_t* data, uint8_t* size) {
+Error SAME51::read(uint32_t* id, uint8_t* ext, uint8_t* data, uint8_t* size) {
     if (!ready_) {
         return ERR_READY;
     }
@@ -100,7 +100,7 @@ Error CANSAME51::read(uint32_t* id, uint8_t* ext, uint8_t* data, uint8_t* size) 
     }
 }
 
-Error CANSAME51::write(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size) {
+Error SAME51::write(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size) {
     if (!ready_) {
         return ERR_READY;
     }

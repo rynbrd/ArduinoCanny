@@ -4,7 +4,7 @@
 // Requires https://github.com/Longan-Labs/Longan_CANFD
 
 #include "boards.h"
-#include "can.h"
+#include "controller.h"
 
 #ifdef CAN_CTRL_MCP2518
 #include <mcp2518fd_can.h>
@@ -12,10 +12,10 @@
 namespace CANBed {
 
 // CAN implementation for the MCP2517 and MCP2518 controllers.
-class CAN2518 : public CAN {
+class MCP2518 : public Controller {
     public:
-        CAN2518(uint8_t cs_pin) : mcp_(cs_pin), ready_(false) {}
-        ~CAN2518() override = default;
+        MCP2518(uint8_t cs_pin) : mcp_(cs_pin), ready_(false) {}
+        ~MCP2518() override = default;
 
         bool begin(Bitrate bitrate) override;
         Mode mode() const override;

@@ -5,7 +5,7 @@
 #ifdef CAN_CTRL_MCP2518
 
 #include <mcp2518fd_can.h>
-#include "can.h"
+#include "controller.h"
 #include "util.h"
 
 namespace CANBed {
@@ -71,7 +71,7 @@ uint32_t GetMcpBitrate(Bitrate bitrate) {
 
 }  // namespace
 
-bool CAN2518::begin(Bitrate bitrate) {
+bool MCP2518::begin(Bitrate bitrate) {
     bitrate_ = bitrate;
     mode_ = internal::GetMode(bitrate_);
     ready_ = false;
@@ -82,15 +82,15 @@ bool CAN2518::begin(Bitrate bitrate) {
     return ready_;
 }
 
-Mode CAN2518::mode() const {
+Mode MCP2518::mode() const {
     return mode_;
 }
 
-Bitrate CAN2518::bitrate() const {
+Bitrate MCP2518::bitrate() const {
     return bitrate_;
 }
 
-Error CAN2518::read(uint32_t* id, uint8_t* ext, uint8_t* data, uint8_t* size) {
+Error MCP2518::read(uint32_t* id, uint8_t* ext, uint8_t* data, uint8_t* size) {
     if (!ready_) {
         return ERR_READY;
     }
@@ -107,7 +107,7 @@ Error CAN2518::read(uint32_t* id, uint8_t* ext, uint8_t* data, uint8_t* size) {
     return ERR_OK;
 }
 
-Error CAN2518::write(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size) {
+Error MCP2518::write(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size) {
     if (!ready_) {
         return ERR_READY;
     }

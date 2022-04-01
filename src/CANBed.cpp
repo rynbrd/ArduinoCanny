@@ -8,14 +8,14 @@
 namespace CANBed {
 
 #if defined(CANBED_V1)
-CAN2515 can(17);
+MCP2515 can_mcp2515(17);
 
 #elif defined(CANBED_M4)
-CANSAME51 can;
+SAME51 can_same51;
 
 #elif defined(CANBED_RP2040)
-CAN2518 can(12);
-CAN2515 can1(9);
+MCP2518 can_mcp2518(12);
+MCP2515 can_mcp2515(9);
 
 #endif
 

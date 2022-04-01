@@ -5,7 +5,7 @@
 #ifdef CAN_CTRL_MCP2515
 
 #include <mcp_can.h>
-#include "can.h"
+#include "controller.h"
 
 namespace CANBed {
 namespace {
@@ -62,21 +62,21 @@ uint8_t GetMcpBitrate(Bitrate bitrate) {
 
 }  // namespace
 
-bool CAN2515::begin(Bitrate bitrate) {
+bool MCP2515::begin(Bitrate bitrate) {
     bitrate_ = GetFixedBitrate(bitrate);
     ready_ = mcp_.begin(GetMcpBitrate(bitrate_)) == CAN_OK;
     return ready_;
 }
 
-Mode CAN2515::mode() const {
+Mode MCP2515::mode() const {
     return CAN20;
 }
 
-Bitrate CAN2515::bitrate() const {
+Bitrate MCP2515::bitrate() const {
     return bitrate_;
 }
 
-Error CAN2515::read(uint32_t* id, uint8_t* ext, uint8_t* data, uint8_t* size) {
+Error MCP2515::read(uint32_t* id, uint8_t* ext, uint8_t* data, uint8_t* size) {
     if (!ready_) {
         return ERR_READY;
     }
@@ -95,7 +95,7 @@ Error CAN2515::read(uint32_t* id, uint8_t* ext, uint8_t* data, uint8_t* size) {
     return ERR_OK;
 }
 
-Error CAN2515::write(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size) {
+Error MCP2515::write(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size) {
     if (!ready_) {
         return ERR_READY;
     }

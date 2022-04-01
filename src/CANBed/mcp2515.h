@@ -4,7 +4,7 @@
 // Requires https://github.com/Longan-Labs/Aruino_CAN_BUS_MCP2515
 
 #include "boards.h"
-#include "can.h"
+#include "controller.h"
 
 #ifdef CAN_CTRL_MCP2515
 #include <mcp_can.h>
@@ -12,11 +12,11 @@
 namespace CANBed {
 
 // CAN implementation for MCP2515 controller.
-class CAN2515 : public CAN {
+class MCP2515 : public Controller {
     public:
         // Construct a new MCP2515 CAN object that uses the given CS pin.
-        CAN2515(uint8_t cs_pin) : mcp_(cs_pin), ready_(false) {}
-        ~CAN2515() override = default;
+        MCP2515(uint8_t cs_pin) : mcp_(cs_pin), ready_(false) {}
+        ~MCP2515() override = default;
 
         bool begin(Bitrate bitrate) override;
         Mode mode() const override;
