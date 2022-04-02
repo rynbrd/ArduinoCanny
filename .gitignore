@@ -1,3 +1,4 @@
 *.sw?
 *~
-notes
+*.o
+*.out
