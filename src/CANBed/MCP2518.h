@@ -1,13 +1,12 @@
 #ifndef _CANBED_MCP2518_H_
 #define _CANBED_MCP2518_H_
+#pragma message("Including MCP2518 CAN Controller Support")
 
-// Requires https://github.com/Longan-Labs/Longan_CANFD
+// This requires the Longan CANFD library to build:
+// https://github.com/Longan-Labs/Longan_CANFD
 
-#include "boards.h"
-#include "controller.h"
-
-#ifdef CAN_CTRL_MCP2518
 #include <mcp2518fd_can.h>
+#include "controller.h"
 
 namespace CANBed {
 
@@ -31,5 +30,6 @@ class MCP2518 : public Controller {
 
 }  // namespace CANBed
 
-#endif  // CAN_CTRL_MCP2518
+#include "MCP2518.tpp"
+
 #endif  // _CANBED_MCP2518_H_

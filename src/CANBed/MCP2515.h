@@ -1,13 +1,12 @@
 #ifndef _CANBED_MCP2515_H_
 #define _CANBED_MCP2515_H_
+#pragma message("Including MCP2515 CAN Controller Support")
 
-// Requires https://github.com/Longan-Labs/Aruino_CAN_BUS_MCP2515
+// This controller requires the Longan MCP2515 library to build:
+// https://github.com/Longan-Labs/Aruino_CAN_BUS_MCP2515
 
-#include "boards.h"
-#include "controller.h"
-
-#ifdef CAN_CTRL_MCP2515
 #include <mcp_can.h>
+#include "controller.h"
 
 namespace CANBed {
 
@@ -31,5 +30,6 @@ class MCP2515 : public Controller {
 
 }  // namespace CANBed
 
-#endif  // CAN_CTRL_MCP2515
+#include "MCP2515.tpp"
+
 #endif  // _CANBED_MCP2515_H_

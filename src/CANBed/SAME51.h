@@ -1,11 +1,9 @@
 #ifndef _CANBED_SAME51_H_
 #define _CANBED_SAME51_H_
+#pragma message("Including SAME51 CAN Controller Support")
 
-#include "boards.h"
+#include <same51_can.h>
 #include "controller.h"
-
-#ifdef CAN_CTRL_SAME51
-#include "same51_can.h"
 
 namespace CANBed {
 
@@ -30,5 +28,6 @@ class SAME51 : public Controller {
 
 }  // namespace CANBed
 
-#endif  // cAN_CTRL_SAME51
+#include "SAME51.tpp"
+
 #endif  // _CANBED_SAME51_H_

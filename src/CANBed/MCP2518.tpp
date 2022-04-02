@@ -1,17 +1,13 @@
-#include "mcp2518.h"
+// This is implemented as a TPP header file to avoid building this code unless
+// it's used. This is done for efficiency as a board will only have one or two
+// different CAN controllers.
 
-#include "boards.h"
-
-#ifdef CAN_CTRL_MCP2518
-
-#include <mcp2518fd_can.h>
-#include "controller.h"
 #include "util.h"
 
 namespace CANBed {
 namespace {
 
-uint32_t GetMcpBitrate(Bitrate bitrate) {
+uint32_t GetMCP2518Bitrate(Bitrate bitrate) {
     switch(bitrate) {
         case CAN20_125K:
             return CAN20_125KBPS;
@@ -75,7 +71,7 @@ bool MCP2518::begin(Bitrate bitrate) {
     bitrate_ = bitrate;
     mode_ = internal::GetMode(bitrate_);
     ready_ = false;
-    if (mcp_.begin(GetMcpBitrate(bitrate)) == CAN_OK) {
+    if (mcp_.begin(GetMCP2518Bitrate(bitrate)) == CAN_OK) {
         mcp_.setMode(CAN_NORMAL_MODE);
         ready_ = true;
     }
@@ -129,5 +125,3 @@ Error MCP2518::write(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size) {
 }
 
 }  // namespace CANBed
-
-#endif  // CAN_CTRL_MCP2518

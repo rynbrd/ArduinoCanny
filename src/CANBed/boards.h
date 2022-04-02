@@ -11,18 +11,14 @@
 // CANBed V1
 #if defined(ARDUINO_AVR_LEONARDO)
 #define CANBED_V1
-#define CAN_CTRL_MCP2515
 
 // CANBed M4
 #elif defined(ARDUINO_SAMD_VARIANT_COMPLIANCE)
 #define CANBED_M4
-#define CAN_CTRL_SAME51
 
 // CANBed RP2040 and Dual.
 #elif defined(RASPBERRYPI_PICO)
 #define CANBED_RP2040
-#define CAN_CTRL_MCP2515
-#define CAN_CTRL_MCP2518
 #endif
 
 #endif  // _CANBED_DEFINITIONS_H_

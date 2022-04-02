@@ -1,16 +1,11 @@
-#include "mcp2515.h"
-
-#include "boards.h"
-
-#ifdef CAN_CTRL_MCP2515
-
-#include <mcp_can.h>
-#include "controller.h"
+// This is implemented as a TPP header file to avoid building this code unless
+// it's used. This is done for efficiency as a board will only have one or two
+// different CAN controllers.
 
 namespace CANBed {
 namespace {
 
-Bitrate GetFixedBitrate(Bitrate bitrate) {
+Bitrate FixMCP2515Bitrate(Bitrate bitrate) {
     switch (bitrate) {
         case CAN20_125K:
         case CANFD_125K:
@@ -46,7 +41,7 @@ Bitrate GetFixedBitrate(Bitrate bitrate) {
     return CAN20_250K;
 } 
 
-uint8_t GetMcpBitrate(Bitrate bitrate) {
+uint8_t GetMCP2515Bitrate(Bitrate bitrate) {
     switch (bitrate) {
         case CAN20_125K:
             return CAN_125KBPS;
@@ -63,8 +58,8 @@ uint8_t GetMcpBitrate(Bitrate bitrate) {
 }  // namespace
 
 bool MCP2515::begin(Bitrate bitrate) {
-    bitrate_ = GetFixedBitrate(bitrate);
-    ready_ = mcp_.begin(GetMcpBitrate(bitrate_)) == CAN_OK;
+    bitrate_ = FixMCP2515Bitrate(bitrate);
+    ready_ = mcp_.begin(GetMCP2515Bitrate(bitrate_)) == CAN_OK;
     return ready_;
 }
 
@@ -118,5 +113,3 @@ Error MCP2515::write(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size) {
 }
 
 }  // namespace CANBed
-
-#endif  // CAN_CTRL_MCP2515

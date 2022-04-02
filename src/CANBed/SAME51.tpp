@@ -1,15 +1,14 @@
-#include "same51.h"
+// This is implemented as a TPP header file to avoid building this code unless
+// it's used. This is necessary for SAME51 as it is included in the Arduino
+// package instead of as a separate library. It is also helpful for efficiency
+// when the controller is present but not needed.
 
-#include "boards.h"
-
-#ifdef CAN_CTRL_SAME51
-#include "same51_can.h"
 #include "util.h"
 
 namespace CANBed {
 namespace {
 
-Bitrate GetFixedBitrate(Bitrate bitrate) {
+Bitrate FixSAME51Bitrate(Bitrate bitrate) {
     switch(bitrate) {
         case CANFD_500K_4M:
         case CANFD_500K_5M:
@@ -72,7 +71,7 @@ uint32_t GetSAME51Bitrate(Bitrate bitrate) {
 }  // namespace
 
 bool SAME51::begin(Bitrate bitrate) {
-    bitrate_ = GetFixedBitrate(bitrate);
+    bitrate_ = FixSAME51Bitrate(bitrate);
     mode_ = internal::GetMode(bitrate_);
     return same51_.begin(MCP_ANY, GetSAME51Bitrate(bitrate_), MCAN_MODE_CAN) == CAN_OK;
 }
@@ -123,5 +122,3 @@ Error SAME51::write(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size) {
 }
 
 }  // namespace CANBed
-
-#endif  // cAN_CTRL_SAME51
