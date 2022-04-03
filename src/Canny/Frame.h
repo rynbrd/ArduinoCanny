@@ -18,7 +18,10 @@ class Frame {
         uint8_t* const data;
 
         // Construct an empty CAN frame with the specified capacity.
-        Frame(size_t capacity);
+        Frame(uint8_t capacity, uint8_t fill=0x00);
+
+        // Construct a CAN frame with the provided values and capacity.
+        Frame(uint32_t id, uint8_t ext, uint8_t size, uint8_t capacity, uint8_t fill=0x00);
 
         // Copy constructor. If the source frame owns its data then the new
         // frame will hold a copy of that data. It is freed when the frame is
@@ -39,6 +42,16 @@ class Frame {
         // max(size, capacity).
         static Frame Wrap(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size, uint8_t capacity = 0);
 
+        // Clear the frame data. Its bytes set to 0x00 unless fill is set to
+        // another value. This would be 0xFF for J1939 and some other
+        // protocols.
+        void Clear(uint8_t fill=0x00);
+
+        // Convenience method for setting the frame values and clearing the
+        // frame data. The data bytes are set to 0x00 unless fill is set to
+        // another value.
+        void Set(uint8_t id, uint8_t ext, uint8_t size=0, uint8_t fill=0x00);
+
         // Return the capacity of the frame.
         uint8_t Capacity() const;
 
@@ -51,7 +64,14 @@ class Frame {
         const uint8_t capacity_;
         // Whether or not to free the memory pointed to by data.
         const bool free_;
+
+        friend bool operator==(const Frame&, const Frame&);
 };
+
+// Return true if the values of two frames are equal. The id, ext, size, and
+// data are compared directly. Only data[:size] is compared. The capacities of
+// the two frames are ignored.
+bool operator==(const Frame& left, const Frame& right);
 
 }  // namespace Canny
 
