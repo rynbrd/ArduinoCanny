@@ -20,6 +20,11 @@ class Frame {
         // Construct an empty CAN frame with the specified capacity.
         Frame(size_t capacity);
 
+        // Copy constructor. If the source frame owns its data then the new
+        // frame will hold a copy of that data. It is freed when the frame is
+        // freed. Otherwise the pointer to the unowned data is copied.
+        Frame(const Frame& frame);
+
         // Free's the memory pointed to by data if the frame owns that memory.
         ~Frame();
 
