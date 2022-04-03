@@ -5,7 +5,7 @@
 
 namespace Canny {
 
-class Frame {
+class Frame : public Printable {
     public:
         // The ID of the frame. This is an 11-bit value for standard frames and
         // a 29-bit value for extended frames.
@@ -54,6 +54,11 @@ class Frame {
 
         // Return the capacity of the frame.
         uint8_t Capacity() const;
+
+        // Write a human readable string representation of the frame to a
+        // print object. Return the number of bytes written. Implements
+        // Printable.
+        size_t printTo(Print& p) const override;
 
     private:
         // Construct a CAN frame from the provided arguments.

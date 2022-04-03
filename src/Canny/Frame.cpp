@@ -71,6 +71,22 @@ uint8_t Frame::Capacity() const {
     return capacity_;
 }
 
+size_t Frame::printTo(Print& p) const {
+    size_t n = 0;
+    n += p.print(id, HEX);
+    n += p.print("#");
+    for (int i = 0; i < size; i++) {
+        if (data[i] <= 0x0F) {
+            n += p.print("0");
+        }
+        n += p.print(data[i], HEX);
+        if (i < size-1) {
+            n += p.print(":");
+        }
+    }
+    return n;
+}
+
 bool operator==(const Frame& left, const Frame& right) {
     if (left.id != right.id || left.size != right.size || left.ext != right.ext) {
         return false;
