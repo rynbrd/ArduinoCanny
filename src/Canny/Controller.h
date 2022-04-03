@@ -2,6 +2,7 @@
 #define _CANNY_CONTROLLER_H_
 
 #include <Arduino.h>
+#include "Frame.h"
 
 namespace Canny {
 
@@ -112,8 +113,16 @@ class Controller {
         // definition for the meaning of other error codes.
         virtual Error read(uint32_t* id, uint8_t* ext, uint8_t* data, uint8_t* size) = 0;
 
+        // A variant of read that operates on a Frame object. This is
+        // marginally safer than read(id, ...) because it checks the capacity
+        // of the frame before reading data into it. When the controller is in CAN 2.0  
+        // operating mode the frame must have a capacity of at least 8 bytes.
+        // CAN FD requires 64 bytes. ERR_INVALID is returned if there is
+        // insufficient capacity.
+        Error read(Frame* frame);
+
         // Write a frame without blocking. If ext is 0 then id is treated as
-        // a standard (11-bit) identifier; otherwist is is an extended (29-bit)
+        // a standard (11-bit) identifier; otherwise it is an extended (29-bit)
         // identifier. The data buffer must be at least size bytes long.
         //
         // Return ERR_OK on success. Return ERR_FIFO if the internal write
@@ -124,6 +133,10 @@ class Controller {
         // controllers are limited to 64 bytes. See the Error definition for
         // the meaning of other error codes.
         virtual Error write(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size) = 0;
+
+        // A variant of write that operates on a Frame object. Works identical
+        // to write(id, ...). 
+        Error write(const Frame& frame);
 };
 
 }
