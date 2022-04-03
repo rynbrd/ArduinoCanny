@@ -1,8 +1,8 @@
 #ifndef _CANBED_H_
 #define _CANBED_H_
 
-#include "CANBed/boards.h"
-#include "CANBed/controller.h"
+#include "CANBed/Boards.h"
+#include "CANBed/Controller.h"
 
 
 #if defined(CANBED_V1)

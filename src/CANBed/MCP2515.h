@@ -6,7 +6,7 @@
 // https://github.com/Longan-Labs/Aruino_CAN_BUS_MCP2515
 
 #include <mcp_can.h>
-#include "controller.h"
+#include "Controller.h"
 
 namespace CANBed {
 

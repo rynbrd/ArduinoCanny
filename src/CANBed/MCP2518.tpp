@@ -2,7 +2,7 @@
 // it's used. This is done for efficiency as a board will only have one or two
 // different CAN controllers.
 
-#include "util.h"
+#include "Internal.h"
 
 namespace CANBed {
 namespace {

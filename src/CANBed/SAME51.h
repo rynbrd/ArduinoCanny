@@ -3,7 +3,7 @@
 #pragma message("Including SAME51 CAN Controller Support")
 
 #include <same51_can.h>
-#include "controller.h"
+#include "Controller.h"
 
 namespace CANBed {
 

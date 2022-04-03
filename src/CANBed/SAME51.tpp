@@ -3,7 +3,7 @@
 // package instead of as a separate library. It is also helpful for efficiency
 // when the controller is present but not needed.
 
-#include "util.h"
+#include "Internal.h"
 
 namespace CANBed {
 namespace {

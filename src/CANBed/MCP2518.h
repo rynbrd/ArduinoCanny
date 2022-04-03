@@ -6,7 +6,7 @@
 // https://github.com/Longan-Labs/Longan_CANFD
 
 #include <mcp2518fd_can.h>
-#include "controller.h"
+#include "Controller.h"
 
 namespace CANBed {
 

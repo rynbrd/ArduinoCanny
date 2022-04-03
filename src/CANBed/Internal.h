@@ -1,7 +1,7 @@
-#ifndef _CANBED_UTIL_H_
-#define _CANBED_UTIL_H_
+#ifndef _CANBED_INTERNAL_H_
+#define _CANBED_INTERNAL_H_
 
-#include "controller.h"
+#include "Controller.h"
 
 namespace CANBed {
 namespace internal {
@@ -12,4 +12,4 @@ Mode GetMode(Bitrate bitrate);
 }
 }
 
-#endif  // _CANBED_UTIL_H_
+#endif  // _CANBED_INTERNAL_H_
