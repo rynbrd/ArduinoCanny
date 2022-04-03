@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <CANBed.h>
+#include <CANBed/Detect.h>
 
 using namespace CANBed;
 

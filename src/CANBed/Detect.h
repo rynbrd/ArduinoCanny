@@ -1,5 +1,5 @@
-#ifndef _CANBED_DEFINITIONS_H_
-#define _CANBED_DEFINITIONS_H_
+#ifndef _CANBED_DETECT_H_
+#define _CANBED_DETECT_H_
 
 #include <Arduino.h>
 
@@ -10,15 +10,31 @@
 
 // CANBed V1
 #if defined(ARDUINO_AVR_LEONARDO)
-#define CANBED_V1
+#include "CANBed/MCP2515.h"
+namespace CANBed {
+MCP2515 can_mcp2515(17);
+}
+#define CAN ::CANBed::can_mcp2515
 
 // CANBed M4
 #elif defined(ARDUINO_SAMD_VARIANT_COMPLIANCE)
-#define CANBED_M4
+#include "CANBed/SAME51.h"
+namespace CANBed {
+SAME51 can_same51;
+}
+#define CAN ::CANBed::can_same51
 
 // CANBed RP2040 and Dual.
 #elif defined(RASPBERRYPI_PICO)
-#define CANBED_RP2040
+#include "CANBed/MCP2518.h"
+#include "CANBed/MCP2515.h"
+namespace CANBed {
+MCP2518 can_mcp2518(12);
+MCP2515 can_mcp2515(9);
+}
+#define CAN ::CANBed::can_mcp2518
+#define CAN1 ::CANBed::can_mcp2515
+
 #endif
 
-#endif  // _CANBED_DEFINITIONS_H_
+#endif  // _CANBED_DETECT_H_
