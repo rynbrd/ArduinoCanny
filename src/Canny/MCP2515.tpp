@@ -2,7 +2,7 @@
 // it's used. This is done for efficiency as a board will only have one or two
 // different CAN controllers.
 
-namespace CANBed {
+namespace Canny {
 namespace {
 
 Bitrate FixMCP2515Bitrate(Bitrate bitrate) {
@@ -112,4 +112,4 @@ Error MCP2515::write(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size) {
     }
 }
 
-}  // namespace CANBed
+}  // namespace Canny

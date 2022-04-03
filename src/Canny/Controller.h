@@ -1,9 +1,9 @@
-#ifndef _CANBED_CONTROLLER_H_
-#define _CANBED_CONTROLLER_H_
+#ifndef _CANNY_CONTROLLER_H_
+#define _CANNY_CONTROLLER_H_
 
 #include <Arduino.h>
 
-namespace CANBed {
+namespace Canny {
 
 // Returned by a controller to indicate the operating mode.
 enum Mode : uint8_t {
@@ -128,4 +128,4 @@ class Controller {
 
 }
 
-#endif  // _CANBED_CONTROLLER_H_
+#endif  // _CANNY_CONTROLLER_H_

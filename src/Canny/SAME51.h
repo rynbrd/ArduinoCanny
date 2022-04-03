@@ -1,11 +1,11 @@
-#ifndef _CANBED_SAME51_H_
-#define _CANBED_SAME51_H_
+#ifndef _CANNY_SAME51_H_
+#define _CANNY_SAME51_H_
 #pragma message("Including SAME51 CAN Controller Support")
 
 #include <same51_can.h>
 #include "Controller.h"
 
-namespace CANBed {
+namespace Canny {
 
 // CAN implementation for SAME51 boards with integrated CAN FD controller.
 class SAME51 : public Controller {
@@ -26,8 +26,8 @@ class SAME51 : public Controller {
         Bitrate bitrate_;
 };
 
-}  // namespace CANBed
+}  // namespace Canny
 
 #include "SAME51.tpp"
 
-#endif  // _CANBED_SAME51_H_
+#endif  // _CANNY_SAME51_H_

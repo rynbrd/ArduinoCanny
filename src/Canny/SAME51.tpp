@@ -5,7 +5,7 @@
 
 #include "Internal.h"
 
-namespace CANBed {
+namespace Canny {
 namespace {
 
 Bitrate FixSAME51Bitrate(Bitrate bitrate) {
@@ -121,4 +121,4 @@ Error SAME51::write(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size) {
     }
 }
 
-}  // namespace CANBed
+}  // namespace Canny

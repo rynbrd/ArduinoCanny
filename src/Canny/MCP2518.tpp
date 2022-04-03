@@ -4,7 +4,7 @@
 
 #include "Internal.h"
 
-namespace CANBed {
+namespace Canny {
 namespace {
 
 uint32_t GetMCP2518Bitrate(Bitrate bitrate) {
@@ -124,4 +124,4 @@ Error MCP2518::write(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size) {
     return ERR_INTERNAL;
 }
 
-}  // namespace CANBed
+}  // namespace Canny

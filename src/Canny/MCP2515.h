@@ -1,5 +1,5 @@
-#ifndef _CANBED_MCP2515_H_
-#define _CANBED_MCP2515_H_
+#ifndef _CANNY_MCP2515_H_
+#define _CANNY_MCP2515_H_
 #pragma message("Including MCP2515 CAN Controller Support")
 
 // This controller requires the Longan MCP2515 library to build:
@@ -8,7 +8,7 @@
 #include <mcp_can.h>
 #include "Controller.h"
 
-namespace CANBed {
+namespace Canny {
 
 // CAN implementation for MCP2515 controller.
 class MCP2515 : public Controller {
@@ -28,8 +28,8 @@ class MCP2515 : public Controller {
         Bitrate bitrate_;
 };
 
-}  // namespace CANBed
+}  // namespace Canny
 
 #include "MCP2515.tpp"
 
-#endif  // _CANBED_MCP2515_H_
+#endif  // _CANNY_MCP2515_H_

@@ -1,6 +1,6 @@
 #include "Internal.h"
 
-namespace CANBed {
+namespace Canny {
 namespace internal {
 
 Mode GetMode(Bitrate bitrate) {
@@ -13,5 +13,5 @@ Mode GetMode(Bitrate bitrate) {
     return CANFD_DUAL_RATE;
 }
 
-}
-}
+}  // namespace internal
+}  // namespace Canny

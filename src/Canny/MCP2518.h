@@ -1,5 +1,5 @@
-#ifndef _CANBED_MCP2518_H_
-#define _CANBED_MCP2518_H_
+#ifndef _CANNY_MCP2518_H_
+#define _CANNY_MCP2518_H_
 #pragma message("Including MCP2518 CAN Controller Support")
 
 // This requires the Longan CANFD library to build:
@@ -8,7 +8,7 @@
 #include <mcp2518fd_can.h>
 #include "Controller.h"
 
-namespace CANBed {
+namespace Canny {
 
 // CAN implementation for the MCP2517 and MCP2518 controllers.
 class MCP2518 : public Controller {
@@ -28,8 +28,8 @@ class MCP2518 : public Controller {
         Bitrate bitrate_;
 };
 
-}  // namespace CANBed
+}  // namespace Canny
 
 #include "MCP2518.tpp"
 
-#endif  // _CANBED_MCP2518_H_
+#endif  // _CANNY_MCP2518_H_

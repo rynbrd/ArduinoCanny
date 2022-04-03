@@ -1,8 +1,8 @@
 #include <Arduino.h>
-#include <CANBed.h>
-#include <CANBed/Detect.h>
+#include <Canny.h>
+#include <Canny/Detect.h>
 
-using namespace CANBed;
+using namespace Canny;
 
 uint32_t id;
 uint8_t data[8];
