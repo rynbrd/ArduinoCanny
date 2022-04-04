@@ -21,7 +21,8 @@ class Frame : public Printable {
         Frame(uint8_t capacity, uint8_t fill=0x00);
 
         // Construct a CAN frame with the provided values and capacity.
-        Frame(uint32_t id, uint8_t ext, uint8_t size, uint8_t capacity, uint8_t fill=0x00);
+        // Capacity is set to size if no capacity is provided.
+        Frame(uint32_t id, uint8_t ext, uint8_t size, uint8_t capacity = 0, uint8_t fill=0x00);
 
         // Copy constructor. If the source frame owns its data then the new
         // frame will hold a copy of that data. It is freed when the frame is
@@ -33,14 +34,18 @@ class Frame : public Printable {
 
         // Create a new CAN frame with the set of provided values and a copy of
         // the provided data. The capacity of the frame is set to max(size,
-        // capacity).
-        static Frame Copy(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size, uint8_t capacity = 0);
+        // capacity). Extra capacity is padded with the fill value which
+        // defaults to 0x00.
+        static Frame Copy(uint32_t id, uint8_t ext, uint8_t* data,
+                uint8_t size, uint8_t capacity = 0, uint8_t fill=0x00);
 
         // Wrap a CAN frame around a set of frame values and a pointer to the
         // frame's data. The new frame does not take ownership of the memory
         // pointed to by data. The capacity of the frame is set to
-        // max(size, capacity).
-        static Frame Wrap(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size, uint8_t capacity = 0);
+        // max(size, capacity). Capacity should not exceed the size of memory
+        // allocated to data.
+        static Frame Wrap(uint32_t id, uint8_t ext, uint8_t* data,
+                uint8_t size, uint8_t capacity = 0);
 
         // Clear the frame data. Its bytes set to 0x00 unless fill is set to
         // another value. This would be 0xFF for J1939 and some other
@@ -77,6 +82,10 @@ class Frame : public Printable {
 // data are compared directly. Only data[:size] is compared. The capacities of
 // the two frames are ignored.
 bool operator==(const Frame& left, const Frame& right);
+
+// Return true if the values of two frames are not equal.
+// Equivalent to !(left == right).
+bool operator!=(const Frame& left, const Frame& right);
 
 }  // namespace Canny
 

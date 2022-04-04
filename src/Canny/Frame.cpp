@@ -5,12 +5,15 @@
 namespace Canny {
 namespace {
 
-inline uint8_t* CopyData(uint8_t* data, uint8_t size, uint8_t capacity) {
+inline uint8_t* CopyData(uint8_t* data, uint8_t size, uint8_t capacity, uint8_t fill=0x00) {
     if (size > capacity) {
         capacity = size;
     }
     uint8_t* copied_data = new uint8_t[capacity];
     memcpy(copied_data, data, size);
+    if (capacity > size) {
+        memset(copied_data+size, fill, capacity-size);
+    }
     return copied_data;
 }
 
@@ -18,20 +21,19 @@ inline uint8_t* CopyData(uint8_t* data, uint8_t size, uint8_t capacity) {
 
 Frame::Frame(uint8_t capacity, uint8_t fill) : id(0), ext(0), size(0),
     data(new uint8_t[capacity]), capacity_(capacity), free_(true) {
-    if (fill != 0x00) {
-        memset(data, fill, capacity);
-    }
+    Clear(fill);
 }
 
 Frame::Frame(uint32_t id, uint8_t ext, uint8_t size, uint8_t capacity, uint8_t fill) :
-    id(id), ext(ext), size(size), data(new uint8_t[capacity]), capacity_(capacity), free_(true) {
-    if (fill != 0x00) {
-        memset(data, fill, capacity);
-    }
+    id(id), ext(ext), size(size),
+    data(new uint8_t[capacity > size ? capacity : size]),
+    capacity_(capacity > size ? capacity : size), free_(true) {
+    Clear(fill);
 }
 
 Frame::Frame(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size, uint8_t capacity, bool free) :
-    id(id), ext(ext), size(size), data(data), capacity_(capacity), free_(free) {}
+    id(id), ext(ext), size(size), data(data),
+    capacity_(capacity > size ? capacity : size), free_(free) {}
 
 Frame::Frame(const Frame& frame) : id(frame.id), ext(frame.ext), size(frame.size),
     data(frame.free_ ? CopyData(frame.data, frame.size, frame.capacity_) : frame.data),
@@ -43,8 +45,8 @@ Frame::~Frame() {
     } 
 }
 
-Frame Frame::Copy(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size, uint8_t capacity) {
-    return Frame(id, ext, CopyData(data, size, capacity), size, capacity, true);
+Frame Frame::Copy(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size, uint8_t capacity, uint8_t fill) {
+    return Frame(id, ext, CopyData(data, size, capacity, fill), size, capacity, true);
 }
 
 Frame Frame::Wrap(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size, uint8_t capacity) {
@@ -64,7 +66,7 @@ void Frame::Set(uint8_t id, uint8_t ext, uint8_t size, uint8_t fill) {
     if (size != 0) {
         this->size = size;
     }
-    memset(data, fill, capacity_);
+    Clear(fill);
 }
 
 uint8_t Frame::Capacity() const {
@@ -95,6 +97,10 @@ bool operator==(const Frame& left, const Frame& right) {
         return true;
     }
     return memcmp(left.data, right.data, left.size) == 0;
+}
+
+bool operator!=(const Frame& left, const Frame& right) {
+    return !(left == right);
 }
 
 }  // namespace Canny
