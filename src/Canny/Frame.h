@@ -87,6 +87,11 @@ class Frame : public Printable {
         // Printable.
         size_t printTo(Print& p) const override;
 
+        // Copy the contents of one frame to another. The capacity of the
+        // destination frame is expanded if it is less than the size of the
+        // source frame.
+        Frame& operator=(const Frame& frame);
+
     private:
         // The ID of the frame. This is an 11-bit value for standard frames and
         // a 29-bit value for extended frames.

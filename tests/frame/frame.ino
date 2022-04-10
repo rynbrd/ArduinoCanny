@@ -225,6 +225,32 @@ test(ClearTest, SetFill) {
     assertEqual(memcmp(f.data(), expect_data, 64), 0);
 }
 
+test(SetTest, SmallerFrame) {
+    Frame f1(0x123, 0, {0x1A, 0x2B, 0x4C, 0x5D});
+    Frame f2(0x321, 1, {0xF1, 0xE2});
+    uint8_t expect_data[2] = {0xF1, 0xE2};
+    f1 = f2;
+
+    assertEqual(f1.id(), 0x321u);
+    assertEqual(f1.ext(), 1);
+    assertEqual(f1.size(), 2);
+    assertEqual(f1.capacity(), 4);
+    assertEqual(memcmp(f1.data(), expect_data, 2), 0);
+}
+
+test(SetTest, LargerFrame) {
+    Frame f1(0x321, 1, {0xF1, 0xE2});
+    Frame f2(0x123, 0, {0x1A, 0x2B, 0x4C, 0x5D});
+    uint8_t expect_data[4] = {0x1A, 0x2B, 0x4C, 0x5D};
+    f1 = f2;
+
+    assertEqual(f1.id(), 0x123u);
+    assertEqual(f1.ext(), 0);
+    assertEqual(f1.size(), 4);
+    assertEqual(f1.capacity(), 4);
+    assertEqual(memcmp(f1.data(), expect_data, 4), 0);
+}
+
 test(EqualsTest, SameFrame) {
     Frame f(0x01, 0, 8);
     assertTrue(f == f);

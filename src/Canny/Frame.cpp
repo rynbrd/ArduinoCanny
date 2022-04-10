@@ -84,6 +84,20 @@ size_t Frame::printTo(Print& p) const {
     return n;
 }
 
+Frame& Frame::operator=(const Frame& other) {
+    id_ = other.id_;
+    ext_ = other.ext_;
+    size_ = other.size_;
+    if (capacity_ < other.size_) {
+        if (data_ != nullptr) {
+            delete data_;
+        }
+        data_ = new uint8_t[size_];
+        capacity_ = size_;
+    }
+    memcpy(data_, other.data_, size_);
+}
+
 bool operator==(const Frame& left, const Frame& right) {
     if (left.id_ != right.id_ || left.size_ != right.size_ || left.ext_ != right.ext_) {
         return false;
