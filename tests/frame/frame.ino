@@ -65,6 +65,28 @@ test(ConstructorTest, Copy) {
     assertNotEqual(f1.data, f2.data);
 }
 
+test(ConstructorTest, InitializerListDefault) {
+    Frame f(0x123, 0, {0x1A, 0x2B, 0x4C, 0x5D});
+    uint8_t expect_data[4] = {0x1A, 0x2B, 0x4C, 0x5D};
+
+    assertEqual(f.id, 0x123u);
+    assertEqual(f.ext, 0);
+    assertEqual(f.size, 4);
+    assertEqual(f.Capacity(), 4);
+    assertEqual(memcmp(f.data, expect_data, 4), 0);
+}
+
+test(ConstructorTest, InitializerListExtraCapacity) {
+    Frame f(0x123, 0, {0x1A, 0x2B, 0x4C, 0x5D}, 8, 0xFF);
+    uint8_t expect_data[8] = {0x1A, 0x2B, 0x4C, 0x5D, 0xFF, 0xFF, 0xFF, 0xFF};
+
+    assertEqual(f.id, 0x123u);
+    assertEqual(f.ext, 0);
+    assertEqual(f.size, 4);
+    assertEqual(f.Capacity(), 8);
+    assertEqual(memcmp(f.data, expect_data, 8), 0);
+}
+
 test(CopyTest, DefaultCapacity) {
     uint8_t expect_data[8];
     memset(expect_data, 0xB3, 8);

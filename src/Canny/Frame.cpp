@@ -17,6 +17,21 @@ inline uint8_t* CopyData(uint8_t* data, uint8_t size, uint8_t capacity, uint8_t 
     return copied_data;
 }
 
+inline uint8_t* CopyData(const std::initializer_list<uint8_t>& data, uint8_t capacity, uint8_t fill=0x00) {
+    if (data.size() > capacity) {
+        capacity = data.size();
+    }
+    uint8_t* copied_data = new uint8_t[capacity];
+    size_t i = 0;
+    for (auto it = data.begin(); it != data.end(); it++) {
+        copied_data[i++] = *it;
+    }
+    if (capacity > data.size()) {
+        memset(copied_data+data.size(), fill, capacity-data.size());
+    }
+    return copied_data;
+}
+
 }  // namespace
 
 Frame::Frame(uint8_t capacity, uint8_t fill) : id(0), ext(0), size(0),
@@ -30,6 +45,10 @@ Frame::Frame(uint32_t id, uint8_t ext, uint8_t size, uint8_t capacity, uint8_t f
     capacity_(capacity > size ? capacity : size), free_(true) {
     Clear(fill);
 }
+
+Frame::Frame(uint32_t id, uint8_t ext, std::initializer_list<uint8_t> data, uint8_t capacity, uint8_t fill) :
+    id(id), ext(ext), size(data.size()), data(CopyData(data, capacity, fill)),
+    capacity_(capacity > data.size() ? capacity : data.size()), free_(true) {}
 
 Frame::Frame(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size, uint8_t capacity, bool free) :
     id(id), ext(ext), size(size), data(data),
