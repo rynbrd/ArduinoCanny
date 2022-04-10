@@ -34,6 +34,8 @@ inline uint8_t* CopyData(const std::initializer_list<uint8_t>& data, uint8_t cap
 
 }  // namespace
 
+Frame::Frame() : id(0), ext(0), size(0), data(nullptr), capacity_(0), free_(false) {}
+
 Frame::Frame(uint8_t capacity, uint8_t fill) : id(0), ext(0), size(0),
     data(new uint8_t[capacity]), capacity_(capacity), free_(true) {
     Clear(fill);

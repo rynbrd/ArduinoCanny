@@ -17,6 +17,9 @@ class Frame : public Printable {
         // The data transmitted with this frame.
         uint8_t* const data;
 
+        // Construct an empty frame with no capacity. data is set to nullptr.
+        Frame();
+
         // Construct an empty CAN frame with the specified capacity. Each byte
         // of the data capacity is set to fill.
         Frame(uint8_t capacity, uint8_t fill=0x00);

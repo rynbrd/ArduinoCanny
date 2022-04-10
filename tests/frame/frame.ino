@@ -5,6 +5,16 @@
 using namespace aunit;
 using ::Canny::Frame;
 
+test(ConstructorTest, Default) {
+    Frame f;
+    
+    assertEqual(f.id, 0u);
+    assertEqual(f.ext, 0);
+    assertEqual(f.size, 0);
+    assertEqual(f.Capacity(), 0);
+    assertEqual(f.data, nullptr);
+}
+
 test(ConstructorTest, CapacityDefaultFill) {
     Frame f(12); 
     uint8_t expect_data[12];
