@@ -29,12 +29,14 @@ class Frame : public Printable {
         // greater than size the remainder is set to the value of fill.
         Frame(uint32_t id, uint8_t ext, uint8_t size, uint8_t capacity=0, uint8_t fill=0x00);
 
+#ifdef EPOXY_DUINO
         // Construct a CAN frame with the provided values, data, and capacity.
         // The size is set to the length of data. Capacity is set to size if no
         // capacity is provided. If capacity is greater than size the remainder
         // is set to the value of fill.
         Frame(uint32_t id, uint8_t ext, std::initializer_list<uint8_t> data, uint8_t capacity=0,
                 uint8_t fill=0x00);
+#endif
 
         // Copy constructor. If the source frame owns its data then the new
         // frame will hold a copy of that data. It is freed when the frame is

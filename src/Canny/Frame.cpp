@@ -17,6 +17,7 @@ inline uint8_t* CopyData(uint8_t* data, uint8_t size, uint8_t capacity, uint8_t 
     return copied_data;
 }
 
+#ifdef EPOXY_DUINO
 inline uint8_t* CopyData(const std::initializer_list<uint8_t>& data, uint8_t capacity, uint8_t fill=0x00) {
     if (data.size() > capacity) {
         capacity = data.size();
@@ -31,6 +32,7 @@ inline uint8_t* CopyData(const std::initializer_list<uint8_t>& data, uint8_t cap
     }
     return copied_data;
 }
+#endif
 
 }  // namespace
 
@@ -48,9 +50,11 @@ Frame::Frame(uint32_t id, uint8_t ext, uint8_t size, uint8_t capacity, uint8_t f
     clear(fill);
 }
 
+#ifdef EPOXY_DUINO
 Frame::Frame(uint32_t id, uint8_t ext, std::initializer_list<uint8_t> data, uint8_t capacity, uint8_t fill) :
     id(id), ext(ext), size(data.size()), data(CopyData(data, capacity, fill)),
     capacity_(capacity > data.size() ? capacity : data.size()), free_(true) {}
+#endif
 
 Frame::Frame(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size, uint8_t capacity, bool free) :
     id(id), ext(ext), size(size), data(data),

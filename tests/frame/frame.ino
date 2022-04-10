@@ -75,6 +75,7 @@ test(ConstructorTest, Copy) {
     assertNotEqual(f1.data, f2.data);
 }
 
+#ifdef EPOXY_DUINO
 test(ConstructorTest, InitializerListDefault) {
     Frame f(0x123, 0, {0x1A, 0x2B, 0x4C, 0x5D});
     uint8_t expect_data[4] = {0x1A, 0x2B, 0x4C, 0x5D};
@@ -96,6 +97,7 @@ test(ConstructorTest, InitializerListExtraCapacity) {
     assertEqual(f.capacity(), 8);
     assertEqual(memcmp(f.data, expect_data, 8), 0);
 }
+#endif
 
 test(CopyTest, DefaultCapacity) {
     uint8_t expect_data[8];
