@@ -7,7 +7,7 @@ namespace Canny {
 namespace internal {
 
 // Get the mode from the provided bitrate.
-Mode GetMode(Bitrate bitrate);
+Mode getMode(Bitrate bitrate);
 
 }  // namespace internal
 }  // namespace Canny

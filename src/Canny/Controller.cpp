@@ -4,8 +4,8 @@
 namespace Canny {
 
 Error Controller::read(Frame* frame) {
-    if ((mode() == CAN20 && frame->Capacity() < 8) ||
-            ((mode() == CANFD_CONST_RATE || mode() == CANFD_DUAL_RATE) && frame->Capacity() < 64)) {
+    if ((mode() == CAN20 && frame->capacity() < 8) ||
+            ((mode() == CANFD_CONST_RATE || mode() == CANFD_DUAL_RATE) && frame->capacity() < 64)) {
         return ERR_INVALID;
     }
     return read(&frame->id, &frame->ext, frame->data, &frame->size);

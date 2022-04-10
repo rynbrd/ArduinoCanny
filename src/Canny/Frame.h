@@ -33,7 +33,8 @@ class Frame : public Printable {
         // The size is set to the length of data. Capacity is set to size if no
         // capacity is provided. If capacity is greater than size the remainder
         // is set to the value of fill.
-        Frame(uint32_t id, uint8_t ext, std::initializer_list<uint8_t> data, uint8_t capacity=0, uint8_t fill=0x00);
+        Frame(uint32_t id, uint8_t ext, std::initializer_list<uint8_t> data, uint8_t capacity=0,
+                uint8_t fill=0x00);
 
         // Copy constructor. If the source frame owns its data then the new
         // frame will hold a copy of that data. It is freed when the frame is
@@ -47,7 +48,7 @@ class Frame : public Printable {
         // the provided data. The capacity of the frame is set to max(size,
         // capacity). Extra capacity is padded with the fill value which
         // defaults to 0x00.
-        static Frame Copy(uint32_t id, uint8_t ext, uint8_t* data,
+        static Frame copy(uint32_t id, uint8_t ext, uint8_t* data,
                 uint8_t size, uint8_t capacity = 0, uint8_t fill=0x00);
 
         // Wrap a CAN frame around a set of frame values and a pointer to the
@@ -55,21 +56,21 @@ class Frame : public Printable {
         // pointed to by data. The capacity of the frame is set to
         // max(size, capacity). Capacity should not exceed the size of memory
         // allocated to data.
-        static Frame Wrap(uint32_t id, uint8_t ext, uint8_t* data,
+        static Frame wrap(uint32_t id, uint8_t ext, uint8_t* data,
                 uint8_t size, uint8_t capacity = 0);
 
         // Clear the frame data. Its bytes set to 0x00 unless fill is set to
         // another value. This would be 0xFF for J1939 and some other
         // protocols.
-        void Clear(uint8_t fill=0x00);
+        void clear(uint8_t fill=0x00);
 
         // Convenience method for setting the frame values and clearing the
         // frame data. The data bytes are set to 0x00 unless fill is set to
         // another value.
-        void Set(uint8_t id, uint8_t ext, uint8_t size=0, uint8_t fill=0x00);
+        void set(uint8_t id, uint8_t ext, uint8_t size=0, uint8_t fill=0x00);
 
         // Return the capacity of the frame.
-        uint8_t Capacity() const;
+        uint8_t capacity() const;
 
         // Write a human readable string representation of the frame to a
         // print object. Return the number of bytes written. Implements

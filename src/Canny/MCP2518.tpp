@@ -69,7 +69,7 @@ uint32_t GetMCP2518Bitrate(Bitrate bitrate) {
 
 bool MCP2518::begin(Bitrate bitrate) {
     bitrate_ = bitrate;
-    mode_ = internal::GetMode(bitrate_);
+    mode_ = internal::getMode(bitrate_);
     ready_ = false;
     if (mcp_.begin(GetMCP2518Bitrate(bitrate)) == CAN_OK) {
         mcp_.setMode(CAN_NORMAL_MODE);

@@ -72,7 +72,7 @@ uint32_t GetSAME51Bitrate(Bitrate bitrate) {
 
 bool SAME51::begin(Bitrate bitrate) {
     bitrate_ = FixSAME51Bitrate(bitrate);
-    mode_ = internal::GetMode(bitrate_);
+    mode_ = internal::getMode(bitrate_);
     return same51_.begin(MCP_ANY, GetSAME51Bitrate(bitrate_), MCAN_MODE_CAN) == CAN_OK;
 }
 

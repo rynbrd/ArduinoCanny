@@ -38,14 +38,14 @@ Frame::Frame() : id(0), ext(0), size(0), data(nullptr), capacity_(0), free_(fals
 
 Frame::Frame(uint8_t capacity, uint8_t fill) : id(0), ext(0), size(0),
     data(new uint8_t[capacity]), capacity_(capacity), free_(true) {
-    Clear(fill);
+    clear(fill);
 }
 
 Frame::Frame(uint32_t id, uint8_t ext, uint8_t size, uint8_t capacity, uint8_t fill) :
     id(id), ext(ext), size(size),
     data(new uint8_t[capacity > size ? capacity : size]),
     capacity_(capacity > size ? capacity : size), free_(true) {
-    Clear(fill);
+    clear(fill);
 }
 
 Frame::Frame(uint32_t id, uint8_t ext, std::initializer_list<uint8_t> data, uint8_t capacity, uint8_t fill) :
@@ -66,31 +66,31 @@ Frame::~Frame() {
     } 
 }
 
-Frame Frame::Copy(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size, uint8_t capacity, uint8_t fill) {
+Frame Frame::copy(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size, uint8_t capacity, uint8_t fill) {
     return Frame(id, ext, CopyData(data, size, capacity, fill), size, capacity, true);
 }
 
-Frame Frame::Wrap(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size, uint8_t capacity) {
+Frame Frame::wrap(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size, uint8_t capacity) {
     if (size > capacity) {
         capacity = size;
     }
     return Frame(id, ext, data, size, capacity, false);
 }
 
-void Frame::Clear(uint8_t fill) {
+void Frame::clear(uint8_t fill) {
     memset(data, fill, capacity_);
 }
 
-void Frame::Set(uint8_t id, uint8_t ext, uint8_t size, uint8_t fill) {
+void Frame::set(uint8_t id, uint8_t ext, uint8_t size, uint8_t fill) {
     this->id = id;
     this->ext = ext;
     if (size != 0) {
         this->size = size;
     }
-    Clear(fill);
+    clear(fill);
 }
 
-uint8_t Frame::Capacity() const {
+uint8_t Frame::capacity() const {
     return capacity_;
 }
 

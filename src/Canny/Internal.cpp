@@ -3,7 +3,7 @@
 namespace Canny {
 namespace internal {
 
-Mode GetMode(Bitrate bitrate) {
+Mode getMode(Bitrate bitrate) {
     if (bitrate < CANFD_125K) {
         return CAN20;
     }

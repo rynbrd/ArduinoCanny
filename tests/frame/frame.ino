@@ -11,7 +11,7 @@ test(ConstructorTest, Default) {
     assertEqual(f.id, 0u);
     assertEqual(f.ext, 0);
     assertEqual(f.size, 0);
-    assertEqual(f.Capacity(), 0);
+    assertEqual(f.capacity(), 0);
     assertEqual(f.data, nullptr);
 }
 
@@ -23,7 +23,7 @@ test(ConstructorTest, CapacityDefaultFill) {
     assertEqual(f.id, 0u);
     assertEqual(f.ext, 0);
     assertEqual(f.size, 0);
-    assertEqual(f.Capacity(), 12);
+    assertEqual(f.capacity(), 12);
     assertEqual(memcmp(f.data, expect_data, 12), 0);
 }
 
@@ -35,7 +35,7 @@ test(ConstructorTest, CapacitySetFill) {
     assertEqual(f.id, 0u);
     assertEqual(f.ext, 0);
     assertEqual(f.size, 0);
-    assertEqual(f.Capacity(), 21);
+    assertEqual(f.capacity(), 21);
     assertEqual(memcmp(f.data, expect_data, 21), 0);
 }
 
@@ -47,7 +47,7 @@ test(ConstructorTest, SetAllDefaults) {
     assertEqual(f.id, 0x321u);
     assertEqual(f.ext, 1);
     assertEqual(f.size, 8);
-    assertEqual(f.Capacity(), 8);
+    assertEqual(f.capacity(), 8);
     assertEqual(memcmp(f.data, expect_data, 8), 0);
 }
 
@@ -59,7 +59,7 @@ test(ConstructorTest, SetAllSetFill) {
     assertEqual(f.id, 0x432u);
     assertEqual(f.ext, 0);
     assertEqual(f.size, 8);
-    assertEqual(f.Capacity(), 12);
+    assertEqual(f.capacity(), 12);
     assertEqual(memcmp(f.data, expect_data, 12), 0);
 }
 
@@ -70,7 +70,7 @@ test(ConstructorTest, Copy) {
     assertEqual(f2.id, 0x123u);
     assertEqual(f2.ext, 0);
     assertEqual(f2.size, 8);
-    assertEqual(f2.Capacity(), 8);
+    assertEqual(f2.capacity(), 8);
     assertEqual(memcmp(f2.data, f1.data, 8), 0);
     assertNotEqual(f1.data, f2.data);
 }
@@ -82,7 +82,7 @@ test(ConstructorTest, InitializerListDefault) {
     assertEqual(f.id, 0x123u);
     assertEqual(f.ext, 0);
     assertEqual(f.size, 4);
-    assertEqual(f.Capacity(), 4);
+    assertEqual(f.capacity(), 4);
     assertEqual(memcmp(f.data, expect_data, 4), 0);
 }
 
@@ -93,19 +93,19 @@ test(ConstructorTest, InitializerListExtraCapacity) {
     assertEqual(f.id, 0x123u);
     assertEqual(f.ext, 0);
     assertEqual(f.size, 4);
-    assertEqual(f.Capacity(), 8);
+    assertEqual(f.capacity(), 8);
     assertEqual(memcmp(f.data, expect_data, 8), 0);
 }
 
 test(CopyTest, DefaultCapacity) {
     uint8_t expect_data[8];
     memset(expect_data, 0xB3, 8);
-    Frame f = Frame::Copy(0x567, 0, expect_data, 8);
+    Frame f = Frame::copy(0x567, 0, expect_data, 8);
 
     assertEqual(f.id, 0x567u);
     assertEqual(f.ext, 0);
     assertEqual(f.size, 8);
-    assertEqual(f.Capacity(), 8);
+    assertEqual(f.capacity(), 8);
     assertEqual(memcmp(f.data, expect_data, 8), 0);
     assertNotEqual(f.data, expect_data);
 }
@@ -118,12 +118,12 @@ test(CopyTest, SetCapacity) {
     memset(expect_data, 0xB4, 8);
     memset(expect_data+8, 0x00, 4);
 
-    Frame f = Frame::Copy(0x567, 0, src_data, 8, 12);
+    Frame f = Frame::copy(0x567, 0, src_data, 8, 12);
 
     assertEqual(f.id, 0x567u);
     assertEqual(f.ext, 0);
     assertEqual(f.size, 8);
-    assertEqual(f.Capacity(), 12);
+    assertEqual(f.capacity(), 12);
     assertEqual(memcmp(f.data, expect_data, 12), 0);
     assertNotEqual(f.data, expect_data);
 }
@@ -131,12 +131,12 @@ test(CopyTest, SetCapacity) {
 test(WrapTest, DefaultCapacity) {
     uint8_t expect_data[8];
     memset(expect_data, 0xC5, 8);
-    Frame f = Frame::Wrap(0x987, 1, expect_data, 8);
+    Frame f = Frame::wrap(0x987, 1, expect_data, 8);
 
     assertEqual(f.id, 0x987u);
     assertEqual(f.ext, 1);
     assertEqual(f.size, 8);
-    assertEqual(f.Capacity(), 8);
+    assertEqual(f.capacity(), 8);
     assertEqual(f.data, expect_data);
 }
 
@@ -144,12 +144,12 @@ test(WrapTest, SetCapacity) {
     uint8_t expect_data[12];
     memset(expect_data, 0xC5, 8);
     memset(expect_data+8, 0xC5, 4);
-    Frame f = Frame::Wrap(0x987, 1, expect_data, 8, 12);
+    Frame f = Frame::wrap(0x987, 1, expect_data, 8, 12);
 
     assertEqual(f.id, 0x987u);
     assertEqual(f.ext, 1);
     assertEqual(f.size, 8);
-    assertEqual(f.Capacity(), 12);
+    assertEqual(f.capacity(), 12);
     assertEqual(f.data, expect_data);
 }
 
@@ -158,12 +158,12 @@ test(ClearTest, DefaultFill) {
     memset(expect_data, 0x00, 64);
 
     Frame f(0x12, 0, 32, 64, 0xFF);
-    f.Clear();
+    f.clear();
 
     assertEqual(f.id, 0x12u);
     assertEqual(f.ext, 0);
     assertEqual(f.size, 32);
-    assertEqual(f.Capacity(), 64);
+    assertEqual(f.capacity(), 64);
     assertEqual(memcmp(f.data, expect_data, 64), 0);
 }
 
@@ -172,12 +172,12 @@ test(ClearTest, SetFill) {
     memset(expect_data, 0xAA, 64);
 
     Frame f(0x12, 0, 32, 64, 0xFF);
-    f.Clear(0xAA);
+    f.clear(0xAA);
 
     assertEqual(f.id, 0x12u);
     assertEqual(f.ext, 0);
     assertEqual(f.size, 32);
-    assertEqual(f.Capacity(), 64);
+    assertEqual(f.capacity(), 64);
     assertEqual(memcmp(f.data, expect_data, 64), 0);
 }
 
@@ -186,12 +186,12 @@ test(SetTest, Defualts) {
     memset(expect_data, 0x00, 64);
 
     Frame f(64);
-    f.Set(0x13, 1);
+    f.set(0x13, 1);
 
     assertEqual(f.id, 0x13u);
     assertEqual(f.ext, 1);
     assertEqual(f.size, 0);
-    assertEqual(f.Capacity(), 64);
+    assertEqual(f.capacity(), 64);
     assertEqual(memcmp(f.data, expect_data, 64), 0);
 }
 
@@ -200,12 +200,12 @@ test(SetTest, SetSizeAndFill) {
     memset(expect_data, 0xFF, 64);
 
     Frame f(64);
-    f.Set(0x13, 1, 8, 0xFF);
+    f.set(0x13, 1, 8, 0xFF);
 
     assertEqual(f.id, 0x13u);
     assertEqual(f.ext, 1);
     assertEqual(f.size, 8);
-    assertEqual(f.Capacity(), 64);
+    assertEqual(f.capacity(), 64);
     assertEqual(memcmp(f.data, expect_data, 64), 0);
 }
 
