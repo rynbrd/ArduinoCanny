@@ -15,22 +15,18 @@ class Frame : public Printable {
         // frame. This can be an expensive operation on slower boards.
         Frame(const Frame& frame);
 
-        // Construct an empty CAN frame with the specified capacity. Each byte
-        // of the data capacity is set to fill.
-        Frame(uint8_t capacity, uint8_t fill=0x00);
+        // Construct an empty CAN frame with the specified capacity.
+        explicit Frame(uint8_t capacity);
 
         // Construct a CAN frame with the provided values and capacity.
-        // Capacity is set to size if no capacity is provided. If capacity is
-        // greater than size the remainder is set to the value of fill.
-        Frame(uint32_t id, uint8_t ext, uint8_t size, uint8_t capacity=0, uint8_t fill=0x00);
+        // Capacity is set to size if no capacity is provided.
+        Frame(uint32_t id, uint8_t ext, uint8_t size, uint8_t capacity=0);
 
 #ifdef EPOXY_DUINO
         // Construct a CAN frame with the provided values, data, and capacity.
         // The size is set to the length of data. Capacity is set to size if no
-        // capacity is provided. If capacity is greater than size the remainder
-        // is set to the value of fill.
-        Frame(uint32_t id, uint8_t ext, std::initializer_list<uint8_t> data, uint8_t capacity=0,
-                uint8_t fill=0x00);
+        // capacity is provided.
+        Frame(uint32_t id, uint8_t ext, std::initializer_list<uint8_t> data, uint8_t capacity=0);
 #endif
 
         // Free's the memory pointed to by data if the frame owns that memory.
@@ -68,19 +64,16 @@ class Frame : public Printable {
         uint8_t* data() const { return data_; }
 
         // Ensures the frame has at least the requested amount of capacity.
-        // Expands the frame's storage to match capacity if necessary. New
-        // bytes are set to fill.
-        void reserve(uint8_t capacity, uint8_t fill=0x00);
+        // Expands the frame's storage to match capacity if necessary.
+        void reserve(uint8_t capacity);
 
-        // Resize the frame's data. Reserves space using the provided fill
-        // value to ensure that enough capacity exists to support the new size.
-        // Reducing a frame's size does not reduce its capacity.
-        void resize(uint8_t size, uint8_t fill=0x00);
+        // Resize the frame's data. Reserves space to ensure that enough
+        // capacity exists to support the new size. Reducing a frame's size
+        // does not reduce its capacity.
+        void resize(uint8_t size);
 
-        // Clear the frame data. Its bytes set to 0x00 unless fill is set to
-        // another value. This would be 0xFF for J1939 and some other
-        // protocols.
-        void clear(uint8_t fill=0x00);
+        // Clear the frame data. Its bytes set to the given fill value.
+        void clear(uint8_t fill);
 
         // Write a human readable string representation of the frame to a
         // print object. Return the number of bytes written. Implements

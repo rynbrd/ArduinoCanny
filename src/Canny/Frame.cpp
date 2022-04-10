@@ -13,26 +13,23 @@ Frame::Frame(const Frame& frame) :
     memcpy(data_, frame.data_, capacity_);
 }
 
-Frame::Frame(uint8_t capacity, uint8_t fill) : Frame() {
-    reserve(capacity, fill);
+Frame::Frame(uint8_t capacity) : Frame() {
+    reserve(capacity);
 }
 
-Frame::Frame(uint32_t id, uint8_t ext, uint8_t size, uint8_t capacity, uint8_t fill) :
+Frame::Frame(uint32_t id, uint8_t ext, uint8_t size, uint8_t capacity) :
         id_(id), ext_(ext), size_(size), data_(nullptr) {
-    reserve(max(size, capacity), fill);
+    reserve(max(size, capacity));
 }
 
 #ifdef EPOXY_DUINO
-Frame::Frame(uint32_t id, uint8_t ext, std::initializer_list<uint8_t> data, uint8_t capacity,
-        uint8_t fill) : id_(id), ext_(ext), size_(data.size()),
+Frame::Frame(uint32_t id, uint8_t ext, std::initializer_list<uint8_t> data, uint8_t capacity) :
+        id_(id), ext_(ext), size_(data.size()),
         capacity_(max((uint8_t)data.size(), capacity)),
         data_(new uint8_t[capacity_]) {
     uint8_t i = 0;
     for (auto it = data.begin(); it != data.end(); it++) {
         data_[i++] = *it;
-    }
-    if (capacity > data.size()) {
-        memset(data_+data.size(), fill, capacity-data.size());
     }
 }
 #endif
@@ -44,7 +41,7 @@ Frame::~Frame() {
     } 
 }
 
-void Frame::reserve(uint8_t capacity, uint8_t fill) {
+void Frame::reserve(uint8_t capacity) {
     if (capacity <= capacity_) {
         return;
     }
@@ -54,13 +51,12 @@ void Frame::reserve(uint8_t capacity, uint8_t fill) {
         memcpy(new_data, data_, capacity_);
         delete data_;
     }
-    memset(new_data+capacity_, fill, capacity-capacity_);
     capacity_ = capacity;
     data_ = new_data;
 }
 
-void Frame::resize(uint8_t size, uint8_t fill) {
-    reserve(size, fill);
+void Frame::resize(uint8_t size) {
+    reserve(size);
     size_ = size;
 }
 
@@ -96,6 +92,7 @@ Frame& Frame::operator=(const Frame& other) {
         capacity_ = size_;
     }
     memcpy(data_, other.data_, size_);
+    return *this;
 }
 
 bool operator==(const Frame& left, const Frame& right) {
