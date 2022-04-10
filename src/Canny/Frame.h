@@ -7,18 +7,13 @@ namespace Canny {
 
 class Frame : public Printable {
     public:
-        // The ID of the frame. This is an 11-bit value for standard frames and
-        // a 29-bit value for extended frames.
-        uint32_t id;
-        // Set to 0 for standard frame or 1 for extended frame.
-        uint8_t ext;
-        // The size of the data in the frame.
-        uint8_t size;
-        // The data transmitted with this frame.
-        uint8_t* const data;
-
-        // Construct an empty frame with no capacity. data is set to nullptr.
+        // Construct an empty frame with no capacity. Its data is set to
+        // nullptr and its capacity 0.
         Frame();
+
+        // Copy constructor. The frame's values and data are copied to the new
+        // frame. This can be an expensive operation on slower boards.
+        Frame(const Frame& frame);
 
         // Construct an empty CAN frame with the specified capacity. Each byte
         // of the data capacity is set to fill.
@@ -38,41 +33,54 @@ class Frame : public Printable {
                 uint8_t fill=0x00);
 #endif
 
-        // Copy constructor. If the source frame owns its data then the new
-        // frame will hold a copy of that data. It is freed when the frame is
-        // freed. Otherwise the pointer to the unowned data is copied.
-        Frame(const Frame& frame);
-
         // Free's the memory pointed to by data if the frame owns that memory.
         ~Frame();
 
-        // Create a new CAN frame with the set of provided values and a copy of
-        // the provided data. The capacity of the frame is set to max(size,
-        // capacity). Extra capacity is padded with the fill value which
-        // defaults to 0x00.
-        static Frame copy(uint32_t id, uint8_t ext, uint8_t* data,
-                uint8_t size, uint8_t capacity = 0, uint8_t fill=0x00);
+        // Return the ID of the frame. This is an 11-bit value for standard
+        // frames and a 29-bit value for extended frames.
+        uint32_t id() const { return id_; }
 
-        // Wrap a CAN frame around a set of frame values and a pointer to the
-        // frame's data. The new frame does not take ownership of the memory
-        // pointed to by data. The capacity of the frame is set to
-        // max(size, capacity). Capacity should not exceed the size of memory
-        // allocated to data.
-        static Frame wrap(uint32_t id, uint8_t ext, uint8_t* data,
-                uint8_t size, uint8_t capacity = 0);
+        // Set the ID of the frame.
+        void id(uint32_t id) { id_ = id; }
+
+        // Set the ID of the frame. The ext argument must be set to 1 to
+        // indicate that the ID is a 29-bit identifier. Otherwise it is treated
+        // as 11-bits.
+        void id(uint32_t id, uint8_t ext);
+
+        // Return 1 if the frame ID is 29-bit extended identifier. Other values
+        // indicate a 11-bit standard identifier.
+        uint8_t ext() const { return ext_; }
+
+        // Set the ext property of the frame. If ext is 1 then the frame holds
+        // an extended (29-bit) identifier. Otherwise it holds a standard
+        // (11-bit) identifier.
+        void ext(uint8_t ext) { ext_ = (ext == 1) ? 1 : 0; } 
+
+        // Return the length of the frame's data in bytes.
+        uint8_t size() const { return size_; }
+
+        // Return the capacity of the frame's data buffer.
+        uint8_t capacity() const { return capacity_; }
+
+        // Return a pointer to the frame's data. The data is mutable and is at
+        // least capacity() bytes long. Return nullptr if capacity is 0.
+        uint8_t* data() const { return data_; }
+
+        // Ensures the frame has at least the requested amount of capacity.
+        // Expands the frame's storage to match capacity if necessary. New
+        // bytes are set to fill.
+        void reserve(uint8_t capacity, uint8_t fill=0x00);
+
+        // Resize the frame's data. Reserves space using the provided fill
+        // value to ensure that enough capacity exists to support the new size.
+        // Reducing a frame's size does not reduce its capacity.
+        void resize(uint8_t size, uint8_t fill=0x00);
 
         // Clear the frame data. Its bytes set to 0x00 unless fill is set to
         // another value. This would be 0xFF for J1939 and some other
         // protocols.
         void clear(uint8_t fill=0x00);
-
-        // Convenience method for setting the frame values and clearing the
-        // frame data. The data bytes are set to 0x00 unless fill is set to
-        // another value.
-        void set(uint8_t id, uint8_t ext, uint8_t size=0, uint8_t fill=0x00);
-
-        // Return the capacity of the frame.
-        uint8_t capacity() const;
 
         // Write a human readable string representation of the frame to a
         // print object. Return the number of bytes written. Implements
@@ -80,16 +88,33 @@ class Frame : public Printable {
         size_t printTo(Print& p) const override;
 
     private:
-        // Construct a CAN frame from the provided arguments.
-        Frame(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size, uint8_t capacity, bool free);
-
+        // The ID of the frame. This is an 11-bit value for standard frames and
+        // a 29-bit value for extended frames.
+        uint32_t id_;
+        // Set to 0 for standard frame or 1 for extended frame.
+        uint8_t ext_;
+        // The size of the data in the frame.
+        uint8_t size_;
         // The capacity of the frame. This should generally be 8 for CAN 2.0
         // frames and 64 for CAN FD frames.
-        const uint8_t capacity_;
-        // Whether or not to free the memory pointed to by data.
-        const bool free_;
+        uint8_t capacity_;
+        // The data transmitted with this frame.
+        uint8_t* data_;
+
+        // Return a mutable pointer to the frame's ID. This is used by
+        // controller implementations to efficiently set the frame's ID.
+        inline uint32_t* mutable_id() { return &id_; }
+
+        // Return a mutable pointer to the frame's ext property. This is used
+        // by controller implementations to efficiently set the frame's ext.
+        uint8_t* mutable_ext() { return &ext_; }
+
+        // Return a mutable pointer to the frame's size property. This is used
+        // by controller implementations to efficiently set the frame's size.
+        uint8_t* mutable_size() { return &size_; }
 
         friend bool operator==(const Frame&, const Frame&);
+        friend class Controller;
 };
 
 // Return true if the values of two frames are equal. The id, ext, size, and

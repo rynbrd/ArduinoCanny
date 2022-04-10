@@ -3,111 +3,81 @@
 #include <Arduino.h>
 
 namespace Canny {
-namespace {
 
-inline uint8_t* CopyData(uint8_t* data, uint8_t size, uint8_t capacity, uint8_t fill=0x00) {
-    if (size > capacity) {
-        capacity = size;
-    }
-    uint8_t* copied_data = new uint8_t[capacity];
-    memcpy(copied_data, data, size);
-    if (capacity > size) {
-        memset(copied_data+size, fill, capacity-size);
-    }
-    return copied_data;
+Frame::Frame() : id_(0), ext_(0), size_(0), capacity_(0), data_(nullptr) {}
+
+Frame::Frame(const Frame& frame) :
+        id_(frame.id_), ext_(frame.ext_),
+        size_(frame.size_), capacity_(frame.capacity_),
+        data_(new uint8_t[capacity_]) {
+    memcpy(data_, frame.data_, capacity_);
 }
 
-#ifdef EPOXY_DUINO
-inline uint8_t* CopyData(const std::initializer_list<uint8_t>& data, uint8_t capacity, uint8_t fill=0x00) {
-    if (data.size() > capacity) {
-        capacity = data.size();
-    }
-    uint8_t* copied_data = new uint8_t[capacity];
-    size_t i = 0;
-    for (auto it = data.begin(); it != data.end(); it++) {
-        copied_data[i++] = *it;
-    }
-    if (capacity > data.size()) {
-        memset(copied_data+data.size(), fill, capacity-data.size());
-    }
-    return copied_data;
-}
-#endif
-
-}  // namespace
-
-Frame::Frame() : id(0), ext(0), size(0), data(nullptr), capacity_(0), free_(false) {}
-
-Frame::Frame(uint8_t capacity, uint8_t fill) : id(0), ext(0), size(0),
-    data(new uint8_t[capacity]), capacity_(capacity), free_(true) {
-    clear(fill);
+Frame::Frame(uint8_t capacity, uint8_t fill) : Frame() {
+    reserve(capacity, fill);
 }
 
 Frame::Frame(uint32_t id, uint8_t ext, uint8_t size, uint8_t capacity, uint8_t fill) :
-    id(id), ext(ext), size(size),
-    data(new uint8_t[capacity > size ? capacity : size]),
-    capacity_(capacity > size ? capacity : size), free_(true) {
-    clear(fill);
+        id_(id), ext_(ext), size_(size), data_(nullptr) {
+    reserve(max(size, capacity), fill);
 }
 
 #ifdef EPOXY_DUINO
-Frame::Frame(uint32_t id, uint8_t ext, std::initializer_list<uint8_t> data, uint8_t capacity, uint8_t fill) :
-    id(id), ext(ext), size(data.size()), data(CopyData(data, capacity, fill)),
-    capacity_(capacity > data.size() ? capacity : data.size()), free_(true) {}
+Frame::Frame(uint32_t id, uint8_t ext, std::initializer_list<uint8_t> data, uint8_t capacity,
+        uint8_t fill) : id_(id), ext_(ext), size_(data.size()),
+        capacity_(max((uint8_t)data.size(), capacity)),
+        data_(new uint8_t[capacity_]) {
+    uint8_t i = 0;
+    for (auto it = data.begin(); it != data.end(); it++) {
+        data_[i++] = *it;
+    }
+    if (capacity > data.size()) {
+        memset(data_+data.size(), fill, capacity-data.size());
+    }
+}
 #endif
 
-Frame::Frame(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size, uint8_t capacity, bool free) :
-    id(id), ext(ext), size(size), data(data),
-    capacity_(capacity > size ? capacity : size), free_(free) {}
-
-Frame::Frame(const Frame& frame) : id(frame.id), ext(frame.ext), size(frame.size),
-    data(frame.free_ ? CopyData(frame.data, frame.size, frame.capacity_) : frame.data),
-    capacity_(frame.capacity_), free_(frame.free_) {}
-
 Frame::~Frame() {
-    if (free_) {
-        delete data;
+    if (data_ != nullptr) {
+        delete data_;
+        data_ = nullptr;
     } 
 }
 
-Frame Frame::copy(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size, uint8_t capacity, uint8_t fill) {
-    return Frame(id, ext, CopyData(data, size, capacity, fill), size, capacity, true);
+void Frame::reserve(uint8_t capacity, uint8_t fill) {
+    if (capacity <= capacity_) {
+        return;
+    }
+
+    uint8_t* new_data = new uint8_t[capacity];
+    if (data_ != nullptr) {
+        memcpy(new_data, data_, capacity_);
+        delete data_;
+    }
+    memset(new_data+capacity_, fill, capacity-capacity_);
+    capacity_ = capacity;
+    data_ = new_data;
 }
 
-Frame Frame::wrap(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size, uint8_t capacity) {
-    if (size > capacity) {
-        capacity = size;
-    }
-    return Frame(id, ext, data, size, capacity, false);
+void Frame::resize(uint8_t size, uint8_t fill) {
+    reserve(size, fill);
+    size_ = size;
 }
 
 void Frame::clear(uint8_t fill) {
-    memset(data, fill, capacity_);
-}
-
-void Frame::set(uint8_t id, uint8_t ext, uint8_t size, uint8_t fill) {
-    this->id = id;
-    this->ext = ext;
-    if (size != 0) {
-        this->size = size;
-    }
-    clear(fill);
-}
-
-uint8_t Frame::capacity() const {
-    return capacity_;
+    memset(data_, fill, capacity_);
 }
 
 size_t Frame::printTo(Print& p) const {
     size_t n = 0;
-    n += p.print(id, HEX);
+    n += p.print(id_, HEX);
     n += p.print("#");
-    for (int i = 0; i < size; i++) {
-        if (data[i] <= 0x0F) {
+    for (int i = 0; i < size_; i++) {
+        if (data_[i] <= 0x0F) {
             n += p.print("0");
         }
-        n += p.print(data[i], HEX);
-        if (i < size-1) {
+        n += p.print(data_[i], HEX);
+        if (i < size_-1) {
             n += p.print(":");
         }
     }
@@ -115,13 +85,13 @@ size_t Frame::printTo(Print& p) const {
 }
 
 bool operator==(const Frame& left, const Frame& right) {
-    if (left.id != right.id || left.size != right.size || left.ext != right.ext) {
+    if (left.id_ != right.id_ || left.size_ != right.size_ || left.ext_ != right.ext_) {
         return false;
     }
-    if (left.data == right.data) {
+    if (left.data_ == right.data_) {
         return true;
     }
-    return memcmp(left.data, right.data, left.size) == 0;
+    return memcmp(left.data_, right.data_, left.size_) == 0;
 }
 
 bool operator!=(const Frame& left, const Frame& right) {

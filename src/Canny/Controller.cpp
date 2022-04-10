@@ -4,15 +4,20 @@
 namespace Canny {
 
 Error Controller::read(Frame* frame) {
-    if ((mode() == CAN20 && frame->capacity() < 8) ||
-            ((mode() == CANFD_CONST_RATE || mode() == CANFD_DUAL_RATE) && frame->capacity() < 64)) {
-        return ERR_INVALID;
+    switch (mode()) {
+        case CAN20:
+            frame->reserve(8);
+            break;
+        case CANFD_CONST_RATE:
+        case CANFD_DUAL_RATE:
+            frame->reserve(64);
+            break;
     }
-    return read(&frame->id, &frame->ext, frame->data, &frame->size);
+    return read(frame->mutable_id(), frame->mutable_ext(), frame->data(), frame->mutable_size());
 }
 
 Error Controller::write(const Frame& frame) {
-    return write(frame.id, frame.ext, frame.data, frame.size);
+    return write(frame.id(), frame.ext(), frame.data(), frame.size());
 }
 
 }  // namespace Canny

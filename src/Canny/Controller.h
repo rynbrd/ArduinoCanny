@@ -114,11 +114,13 @@ class Controller {
         virtual Error read(uint32_t* id, uint8_t* ext, uint8_t* data, uint8_t* size) = 0;
 
         // A variant of read that operates on a Frame object. This is
-        // marginally safer than read(id, ...) because it checks the capacity
-        // of the frame before reading data into it. When the controller is in CAN 2.0  
-        // operating mode the frame must have a capacity of at least 8 bytes.
-        // CAN FD requires 64 bytes. ERR_INVALID is returned if there is
-        // insufficient capacity.
+        // marginally safer than read(id, ...) because it reserves the required
+        // capacity in the frame before reading data into it. The extra
+        // overhead can be avoided by allocating a frame with sufficient
+        // capacity ahead of time. In this case the reserve is a noop.
+        //
+        // When the controller is in CAN 2.0  operating mode the frame requires
+        // a capacity of at least 8 bytes. CAN FD requires 64 bytes.
         Error read(Frame* frame);
 
         // Write a frame without blocking. If ext is 0 then id is treated as
