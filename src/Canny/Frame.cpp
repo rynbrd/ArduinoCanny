@@ -41,6 +41,11 @@ Frame::~Frame() {
     } 
 }
 
+void Frame::id(uint32_t id, uint8_t ext) {
+    id_ = id;
+    ext_ = (ext == 1) ? 1 : 0;
+}
+
 void Frame::reserve(uint8_t capacity) {
     if (capacity <= capacity_) {
         return;
