@@ -31,6 +31,7 @@ Frame::Frame(uint32_t id, uint8_t ext, std::initializer_list<uint8_t> data, uint
     for (auto it = data.begin(); it != data.end(); it++) {
         data_[i++] = *it;
     }
+    memset(data_+size_, 0, capacity_-size_);
 }
 #endif
 
@@ -54,7 +55,10 @@ void Frame::reserve(uint8_t capacity) {
     uint8_t* new_data = new uint8_t[capacity];
     if (data_ != nullptr) {
         memcpy(new_data, data_, capacity_);
+        memset(new_data+capacity_, 0, capacity-capacity_);
         delete[] data_;
+    } else {
+        memset(new_data, 0, capacity);
     }
     capacity_ = capacity;
     data_ = new_data;
@@ -106,6 +110,9 @@ bool operator==(const Frame& left, const Frame& right) {
     }
     if (left.data_ == right.data_) {
         return true;
+    }
+    if (left.data_ == nullptr || right.data_ == nullptr) {
+        return false;
     }
     return memcmp(left.data_, right.data_, left.size_) == 0;
 }
