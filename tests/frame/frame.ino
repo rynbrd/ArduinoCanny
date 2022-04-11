@@ -17,7 +17,6 @@ test(ConstructorTest, Default) {
 
 test(ConstructorTest, Capacity) {
     Frame f(12); 
-    memset(f.data(), 0, 12);
     uint8_t expect_data[12];
     memset(expect_data, 0, 12);
 
@@ -30,7 +29,6 @@ test(ConstructorTest, Capacity) {
 
 test(ConstructorTest, SetAllDefaults) {
     Frame f(0x321, 1, 8);
-    memset(f.data(), 0, 8);
     uint8_t expect_data[8];
     memset(expect_data, 0, 8);
 
@@ -142,7 +140,6 @@ test(ResizeTest, LessSize) {
 
 test(ResizeTest, MoreSizeWithinCapacity) {
     Frame f(0x123, 0, {0x1A, 0x2B, 0x4C, 0x5D}, 8);
-    memset(f.data()+4, 0x00, 4);
     uint8_t expect_data[8] = {0x1A, 0x2B, 0x4C, 0x5D, 0x00, 0x00, 0x00, 0x00};
     f.resize(6);
 
@@ -157,7 +154,6 @@ test(ResizeTest, MoreSizeExceedsCapacity) {
     Frame f(0x123, 0, {0x1A, 0x2B, 0x4C, 0x5D});
     uint8_t expect_data[6] = {0x1A, 0x2B, 0x4C, 0x5D, 0x00, 0x00};
     f.resize(6);
-    memset(f.data()+4, 0, 2);
 
     assertEqual(f.id(), 0x123u);
     assertEqual(f.ext(), 0);
@@ -213,23 +209,18 @@ test(EqualsTest, SameFrame) {
 
 test(EqualsTest, DifferentID) {
     Frame f1(0x01, 0, 8);
-    memset(f1.data(), 0x00, 8);
     Frame f2(0x02, 0, 8);
-    memset(f2.data(), 0x00, 8);
     assertTrue(f1 != f2);
 }
 
 test(EqualsTest, DifferentExt) {
     Frame f1(0x01, 0, 8);
-    memset(f1.data(), 0x00, 8);
     Frame f2(0x01, 1, 8);
-    memset(f2.data(), 0x00, 8);
     assertTrue(f1 != f2);
 }
 
 test(EqualsTest, DifferentData) {
     Frame f1(0x01, 0, 8, 8);
-    memset(f1.data(), 0x00, 8);
     Frame f2(0x01, 0, 8, 8);
     memset(f2.data(), 0xFF, 8);
     assertTrue(f1 != f2);
@@ -237,17 +228,13 @@ test(EqualsTest, DifferentData) {
 
 test(EqualsTest, DifferentSize) {
     Frame f1(0x01, 0, 8, 64);
-    memset(f1.data(), 0x00, 8);
     Frame f2(0x01, 0, 16, 64);
-    memset(f1.data(), 0x00, 16);
     assertTrue(f1 != f2);
 }
 
 test(EqualsTest, DifferentCapacity) {
     Frame f1(0x01, 0, 8, 8);
-    memset(f1.data(), 0x00, 8);
     Frame f2(0x01, 0, 8, 64);
-    memset(f2.data(), 0x00, 8);
     assertTrue(f1 == f2);
 }
 
