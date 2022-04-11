@@ -30,7 +30,7 @@ class Frame : public Printable {
 #endif
 
         // Free's the memory pointed to by data if the frame owns that memory.
-        ~Frame();
+        virtual ~Frame();
 
         // Return the ID of the frame. This is an 11-bit value for standard
         // frames and a 29-bit value for extended frames.
@@ -62,6 +62,19 @@ class Frame : public Printable {
         // Return a pointer to the frame's data. The data is mutable and is at
         // least capacity() bytes long. Return nullptr if capacity is 0.
         uint8_t* data() const { return data_; }
+
+        // Return a mutable pointer to the frame's ID. This is used by
+        // controller implementations to efficiently set the frame's ID.
+        inline uint32_t* mutable_id() { return &id_; }
+
+        // Return a mutable pointer to the frame's ext property. This is used
+        // by controller implementations to efficiently set the frame's ext.
+        uint8_t* mutable_ext() { return &ext_; }
+
+        // Return a mutable pointer to the frame's size property. This is used
+        // by controller implementations to efficiently set the frame's size.
+        // The resize() method should be preferred as it is safer.
+        uint8_t* mutable_size() { return &size_; }
 
         // Ensures the frame has at least the requested amount of capacity.
         // Expands the frame's storage to match capacity if necessary.
@@ -99,20 +112,7 @@ class Frame : public Printable {
         // The data transmitted with this frame.
         uint8_t* data_;
 
-        // Return a mutable pointer to the frame's ID. This is used by
-        // controller implementations to efficiently set the frame's ID.
-        inline uint32_t* mutable_id() { return &id_; }
-
-        // Return a mutable pointer to the frame's ext property. This is used
-        // by controller implementations to efficiently set the frame's ext.
-        uint8_t* mutable_ext() { return &ext_; }
-
-        // Return a mutable pointer to the frame's size property. This is used
-        // by controller implementations to efficiently set the frame's size.
-        uint8_t* mutable_size() { return &size_; }
-
         friend bool operator==(const Frame&, const Frame&);
-        friend class Controller;
 };
 
 // Return true if the values of two frames are equal. The id, ext, size, and
