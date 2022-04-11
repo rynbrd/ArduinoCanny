@@ -18,7 +18,7 @@ Frame::Frame(uint8_t capacity) : Frame() {
 }
 
 Frame::Frame(uint32_t id, uint8_t ext, uint8_t size, uint8_t capacity) :
-        id_(id), ext_(ext), size_(size), data_(nullptr) {
+        id_(id), ext_(ext), size_(size), capacity_(0), data_(nullptr) {
     reserve(max(size, capacity));
 }
 
@@ -36,7 +36,7 @@ Frame::Frame(uint32_t id, uint8_t ext, std::initializer_list<uint8_t> data, uint
 
 Frame::~Frame() {
     if (data_ != nullptr) {
-        delete data_;
+        delete[] data_;
         data_ = nullptr;
     } 
 }
@@ -54,7 +54,7 @@ void Frame::reserve(uint8_t capacity) {
     uint8_t* new_data = new uint8_t[capacity];
     if (data_ != nullptr) {
         memcpy(new_data, data_, capacity_);
-        delete data_;
+        delete[] data_;
     }
     capacity_ = capacity;
     data_ = new_data;
@@ -91,7 +91,7 @@ Frame& Frame::operator=(const Frame& other) {
     size_ = other.size_;
     if (capacity_ < other.size_) {
         if (data_ != nullptr) {
-            delete data_;
+            delete[] data_;
         }
         data_ = new uint8_t[size_];
         capacity_ = size_;
