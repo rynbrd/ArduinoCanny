@@ -47,6 +47,16 @@ void Frame::id(uint32_t id, uint8_t ext) {
     ext_ = (ext == 1) ? 1 : 0;
 }
 
+#ifdef EPOXY_DUINO
+void Frame::data(std::initializer_list<uint8_t> data) {
+    resize(data.size());
+    uint8_t i = 0;
+    for (auto it = data.begin(); it != data.end(); it++) {
+        data_[i++] = *it;
+    }
+}
+#endif
+
 void Frame::reserve(uint8_t capacity) {
     if (capacity <= capacity_) {
         return;

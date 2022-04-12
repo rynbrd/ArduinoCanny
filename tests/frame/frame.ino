@@ -88,6 +88,42 @@ test(ConstructorTest, InitializerListExtraCapacity) {
     assertEqual(f.capacity(), 8);
     assertEqual(memcmp(f.data(), expect_data, 8), 0);
 }
+
+test(DataTest, LessSize) {
+    Frame f(0x123, 0, {0x1A, 0x2B, 0x4C, 0x5D, 0x6E, 0x7F, 0x80, 0x91});
+    uint8_t expect_data[8] = {0x5D, 0x6E, 0x80, 0x91};
+    f.data({0x5D, 0x6E, 0x80, 0x91});
+
+    assertEqual(f.id(), 0x123u);
+    assertEqual(f.ext(), 0);
+    assertEqual(f.size(), 4);
+    assertEqual(f.capacity(), 8);
+    assertEqual(memcmp(f.data(), expect_data, 4), 0);
+}
+
+test(DataTest, SameSize) {
+    Frame f(0x123, 0, {0x1A, 0x2B, 0x4C, 0x5D});
+    uint8_t expect_data[4] = {0x5D, 0x6E, 0x80, 0x91};
+    f.data({0x5D, 0x6E, 0x80, 0x91});
+
+    assertEqual(f.id(), 0x123u);
+    assertEqual(f.ext(), 0);
+    assertEqual(f.size(), 4);
+    assertEqual(f.capacity(), 4);
+    assertEqual(memcmp(f.data(), expect_data, 4), 0);
+}
+
+test(DataTest, MoreSize) {
+    Frame f(0x123, 0, {0x1A, 0x2B, 0x4C, 0x5D});
+    uint8_t expect_data[8] = {0x1A, 0x2B, 0x4C, 0x5D, 0x6E, 0x7F, 0x80, 0x91};
+    f.data({0x1A, 0x2B, 0x4C, 0x5D, 0x6E, 0x7F, 0x80, 0x91});
+
+    assertEqual(f.id(), 0x123u);
+    assertEqual(f.ext(), 0);
+    assertEqual(f.size(), 8);
+    assertEqual(f.capacity(), 8);
+    assertEqual(memcmp(f.data(), expect_data, 8), 0);
+}
 #endif
 
 test(ReserveTest, LessCapacity) {

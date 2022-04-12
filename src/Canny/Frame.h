@@ -63,6 +63,12 @@ class Frame : public Printable {
         // least capacity() bytes long. Return nullptr if capacity is 0.
         uint8_t* data() const { return data_; }
 
+#ifdef EPOXY_DUINO
+        // Set the data from the provided initializer list. The frame is
+        // resized to the length of the list.
+        void data(std::initializer_list<uint8_t> data);
+#endif
+
         // Return a mutable pointer to the frame's ID. This is used by
         // controller implementations to efficiently set the frame's ID.
         inline uint32_t* mutable_id() { return &id_; }
