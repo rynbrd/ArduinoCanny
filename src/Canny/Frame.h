@@ -71,7 +71,7 @@ class Frame : public Printable {
 
         // Return a mutable pointer to the frame's ID. This is used by
         // controller implementations to efficiently set the frame's ID.
-        inline uint32_t* mutable_id() { return &id_; }
+        uint32_t* mutable_id() { return &id_; }
 
         // Return a mutable pointer to the frame's ext property. This is used
         // by controller implementations to efficiently set the frame's ext.
