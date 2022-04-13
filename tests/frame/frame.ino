@@ -274,6 +274,54 @@ test(EqualsTest, DifferentCapacity) {
     assertTrue(f1 == f2);
 }
 
+test(MutableTest, MutableID) {
+    Frame f(0x123, 0, {0x1A, 0x2B, 0x4C, 0x5D});
+    uint8_t expect_data[4] = {0x1A, 0x2B, 0x4C, 0x5D};
+
+    *f.mutable_id() = 0x01;
+    assertEqual(f.id(), 0x01u);
+    assertEqual(f.ext(), 0);
+    assertEqual(f.size(), 4);
+    assertEqual(f.capacity(), 4);
+    assertEqual(memcmp(f.data(), expect_data, 4), 0);
+}
+
+test(MutableTest, MutableExt) {
+    Frame f(0x123, 0, {0x1A, 0x2B, 0x4C, 0x5D});
+    uint8_t expect_data[4] = {0x1A, 0x2B, 0x4C, 0x5D};
+
+    *f.mutable_ext() = 1;
+    assertEqual(f.id(), 0x123u);
+    assertEqual(f.ext(), 1);
+    assertEqual(f.size(), 4);
+    assertEqual(f.capacity(), 4);
+    assertEqual(memcmp(f.data(), expect_data, 4), 0);
+}
+
+test(MutableTest, MutableSize) {
+    Frame f(0x123, 0, {0x1A, 0x2B, 0x4C, 0x5D});
+    uint8_t expect_data[4] = {0x1A, 0x2B, 0x4C, 0x5D};
+
+    *f.mutable_size() = 2;
+    assertEqual(f.id(), 0x123u);
+    assertEqual(f.ext(), 0);
+    assertEqual(f.size(), 2);
+    assertEqual(f.capacity(), 4);
+    assertEqual(memcmp(f.data(), expect_data, 4), 0);
+}
+
+test(MutableTest, MutableData) {
+    Frame f(0x123, 0, 4);
+    uint8_t expect_data[4] = {0x1A, 0x2B, 0x4C, 0x5D};
+    memcpy(f.data(), expect_data, 4);
+
+    assertEqual(f.id(), 0x123u);
+    assertEqual(f.ext(), 0);
+    assertEqual(f.size(), 4);
+    assertEqual(f.capacity(), 4);
+    assertEqual(memcmp(f.data(), expect_data, 4), 0);
+}
+
 // Test boilerplate.
 void setup() {
 #ifdef ARDUINO
