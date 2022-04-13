@@ -14,7 +14,7 @@
 namespace Canny {
 MCP2515 can_mcp2515(17);
 }
-#define CAN ::Canny::can_mcp2515
+::Canny::Controller& CAN = ::Canny::can_mcp2515;
 
 // CANBed M4
 #elif defined(ARDUINO_SAMD_VARIANT_COMPLIANCE)
@@ -22,7 +22,7 @@ MCP2515 can_mcp2515(17);
 namespace Canny {
 SAME51 can_same51;
 }
-#define CAN ::Canny::can_same51
+::Canny::Controller& CAN = ::Canny::can_same51;
 
 // CANBed RP2040 and Dual.
 #elif defined(RASPBERRYPI_PICO)
@@ -32,8 +32,8 @@ namespace Canny {
 MCP2518 can_mcp2518(12);
 MCP2515 can_mcp2515(9);
 }
-#define CAN ::Canny::can_mcp2518
-#define CAN1 ::Canny::can_mcp2515
+::Canny::Controller& CAN = ::Canny::can_mcp2518;
+::Canny::Controller& CAN1 = ::Canny::can_mcp2515;
 
 #endif
 
