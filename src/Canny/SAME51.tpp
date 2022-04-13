@@ -85,6 +85,11 @@ Bitrate SAME51::bitrate() const {
     return bitrate_;
 }
 
+Error SAME51::read(Frame* frame) {
+    frame->reserve(64);
+    return read(frame->mutable_id(), frame->mutable_ext(), frame->data(), frame->mutable_size());
+}
+
 Error SAME51::read(uint32_t* id, uint8_t* ext, uint8_t* data, uint8_t* size) {
     if (!ready_) {
         return ERR_READY;
@@ -98,6 +103,10 @@ Error SAME51::read(uint32_t* id, uint8_t* ext, uint8_t* data, uint8_t* size) {
         default:
             return ERR_INTERNAL;
     }
+}
+
+Error SAME51::write(const Frame& frame) {
+    return write(frame.id(), frame.ext(), frame.data(), frame.size());
 }
 
 Error SAME51::write(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size) {

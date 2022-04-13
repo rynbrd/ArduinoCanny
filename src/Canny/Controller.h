@@ -121,7 +121,7 @@ class Controller {
         //
         // When the controller is in CAN 2.0  operating mode the frame requires
         // a capacity of at least 8 bytes. CAN FD requires 64 bytes.
-        Error read(Frame* frame);
+        virtual Error read(Frame* frame) = 0;
 
         // Write a frame without blocking. If ext is 0 then id is treated as
         // a standard (11-bit) identifier; otherwise it is an extended (29-bit)
@@ -138,7 +138,7 @@ class Controller {
 
         // A variant of write that operates on a Frame object. Works identical
         // to write(id, ...). 
-        Error write(const Frame& frame);
+        virtual Error write(const Frame& frame) = 0;
 };
 
 }

@@ -86,6 +86,11 @@ Bitrate MCP2518::bitrate() const {
     return bitrate_;
 }
 
+Error MCP2518::read(Frame* frame) {
+    frame->reserve(64);
+    return read(frame->mutable_id(), frame->mutable_ext(), frame->data(), frame->mutable_size());
+}
+
 Error MCP2518::read(uint32_t* id, uint8_t* ext, uint8_t* data, uint8_t* size) {
     if (!ready_) {
         return ERR_READY;
@@ -101,6 +106,10 @@ Error MCP2518::read(uint32_t* id, uint8_t* ext, uint8_t* data, uint8_t* size) {
         *ext = mcp_.isExtendedFrame();
     }
     return ERR_OK;
+}
+
+Error MCP2518::write(const Frame& frame) {
+    return write(frame.id(), frame.ext(), frame.data(), frame.size());
 }
 
 Error MCP2518::write(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size) {
