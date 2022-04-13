@@ -95,7 +95,7 @@ Error SAME51::read(uint32_t* id, uint8_t* ext, uint8_t* data, uint8_t* size) {
         return ERR_READY;
     }
 
-    switch (same51_.readMsgBuf(id, ext, data, size)) {
+    switch (same51_.readMsgBuf(id, ext, size, data)) {
         case CAN_OK:
             return ERR_OK;
         case CAN_NOMSG:
