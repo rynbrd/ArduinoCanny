@@ -22,12 +22,11 @@ class Frame : public Printable {
         // Capacity is set to size if no capacity is provided.
         Frame(uint32_t id, uint8_t ext, uint8_t size, uint8_t capacity=0);
 
-#ifdef EPOXY_DUINO
         // Construct a CAN frame with the provided values, data, and capacity.
         // The size is set to the length of data. Capacity is set to size if no
         // capacity is provided.
-        Frame(uint32_t id, uint8_t ext, std::initializer_list<uint8_t> data, uint8_t capacity=0);
-#endif
+        template <size_t N> 
+        Frame(uint32_t id, uint8_t ext, const uint8_t (&data)[N], uint8_t capacity=0);
 
         // Free's the memory pointed to by data if the frame owns that memory.
         virtual ~Frame();
@@ -63,11 +62,10 @@ class Frame : public Printable {
         // least capacity() bytes long. Return nullptr if capacity is 0.
         uint8_t* data() const { return data_; }
 
-#ifdef EPOXY_DUINO
         // Set the data from the provided initializer list. The frame is
         // resized to the length of the list.
-        void data(std::initializer_list<uint8_t> data);
-#endif
+        template <size_t N> 
+        void data(const uint8_t (&data)[N]);
 
         // Return a mutable pointer to the frame's ID. This is used by
         // controller implementations to efficiently set the frame's ID.
@@ -129,6 +127,25 @@ bool operator==(const Frame& left, const Frame& right);
 // Return true if the values of two frames are not equal.
 // Equivalent to !(left == right).
 bool operator!=(const Frame& left, const Frame& right);
+
+template <size_t N> 
+Frame::Frame(uint32_t id, uint8_t ext, const uint8_t (&data)[N], uint8_t capacity) :
+        id_(id), ext_(ext), size_(sizeof(data)),
+        capacity_(max((uint8_t)sizeof(data), capacity)),
+        data_(new uint8_t[capacity_]) {
+    for (size_t i = 0; i < sizeof(data); i++) {
+        data_[i] = data[i];
+    }
+    memset(data_+size_, 0, capacity_-size_);
+}
+
+template <size_t N> 
+void Frame::data(const uint8_t (&data)[N]) {
+    resize(sizeof(data));
+    for (size_t i = 0; i < sizeof(data); i++) {
+        data_[i] = data[i];
+    }
+}
 
 }  // namespace Canny
 

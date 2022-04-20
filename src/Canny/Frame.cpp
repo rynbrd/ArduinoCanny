@@ -22,19 +22,6 @@ Frame::Frame(uint32_t id, uint8_t ext, uint8_t size, uint8_t capacity) :
     reserve(max(size, capacity));
 }
 
-#ifdef EPOXY_DUINO
-Frame::Frame(uint32_t id, uint8_t ext, std::initializer_list<uint8_t> data, uint8_t capacity) :
-        id_(id), ext_(ext), size_(data.size()),
-        capacity_(max((uint8_t)data.size(), capacity)),
-        data_(new uint8_t[capacity_]) {
-    uint8_t i = 0;
-    for (auto it = data.begin(); it != data.end(); it++) {
-        data_[i++] = *it;
-    }
-    memset(data_+size_, 0, capacity_-size_);
-}
-#endif
-
 Frame::~Frame() {
     if (data_ != nullptr) {
         delete[] data_;
@@ -46,16 +33,6 @@ void Frame::id(uint32_t id, uint8_t ext) {
     id_ = id;
     ext_ = (ext == 1) ? 1 : 0;
 }
-
-#ifdef EPOXY_DUINO
-void Frame::data(std::initializer_list<uint8_t> data) {
-    resize(data.size());
-    uint8_t i = 0;
-    for (auto it = data.begin(); it != data.end(); it++) {
-        data_[i++] = *it;
-    }
-}
-#endif
 
 void Frame::reserve(uint8_t capacity) {
     if (capacity <= capacity_) {
