@@ -1,6 +1,7 @@
 #ifndef _CANNY_H_
 #define _CANNY_H_
 
+#include <Canny/Connection.h>
 #include <Canny/Controller.h>
 #include <Canny/Frame.h>
 
