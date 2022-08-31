@@ -62,6 +62,11 @@ void Frame::clear(uint8_t fill) {
 
 size_t Frame::printTo(Print& p) const {
     size_t n = 0;
+    if (ext_) {
+        n += p.print("+");
+    } else {
+        n += p.print("-");
+    }
     n += p.print(id_, HEX);
     n += p.print("#");
     for (int i = 0; i < size_; i++) {
