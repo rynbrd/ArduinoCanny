@@ -34,6 +34,14 @@ void Frame::id(uint32_t id, uint8_t ext) {
     ext_ = (ext == 1) ? 1 : 0;
 }
 
+void Frame::data(const uint8_t* data, uint8_t len) {
+    resize(len);
+    for (size_t i = 0; i < len; i++) {
+        data_[i] = data[i];
+    }
+}
+
+
 void Frame::reserve(uint8_t capacity) {
     if (capacity <= capacity_) {
         return;

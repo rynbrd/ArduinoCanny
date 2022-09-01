@@ -67,6 +67,9 @@ class Frame : public Printable {
         template <size_t N> 
         void data(const uint8_t (&data)[N]);
 
+        // Set the data from the provided buffer. The frame is resized to len.
+        void data(const uint8_t* data, uint8_t len);
+
         // Return a mutable pointer to the frame's ID. This is used by
         // controller implementations to efficiently set the frame's ID.
         uint32_t* mutable_id() { return &id_; }
