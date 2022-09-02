@@ -17,20 +17,16 @@ void FrameIDFilter::mode(FilterMode mode) {
 
 void FrameIDFilter::allow(uint32_t frame_id) {
     if (mode_ == FilterMode::ALLOW) {
-        Serial.println("allow -> remove");
         remove(frame_id);
     } else {
-        Serial.println("allow -> add");
         add(frame_id);
     }
 }
 
 void FrameIDFilter::drop(uint32_t frame_id) {
     if (mode_ == FilterMode::ALLOW) {
-        Serial.println("drop -> add");
         add(frame_id);
     } else {
-        Serial.println("drop -> remove");
         remove(frame_id);
     }
 }
@@ -38,23 +34,14 @@ void FrameIDFilter::drop(uint32_t frame_id) {
 void FrameIDFilter::add(uint32_t frame_id) {
     reserve();
     items_[len_++] = frame_id;
-    Serial.print("added "); Serial.println(frame_id, HEX);
-    for (size_t i = 0; i < len_; i++) {
-        Serial.print("  item: "); Serial.println(items_[i], HEX);
-    }
 }
 
 void FrameIDFilter::remove(uint32_t frame_id) {
     for (size_t i = 0; i < len_; i++) {
         while (items_[i] == frame_id) {
-            Serial.println("removing");
             memcpy(items_ + i, items_ + i + 1, (len_ - i - 1) * sizeof(uint32_t));
             --len_;
         }
-    }
-    Serial.print("removed "); Serial.println(frame_id, HEX);
-    for (size_t i = 0; i < len_; i++) {
-        Serial.print("  item: "); Serial.println(items_[i], HEX);
     }
 }
 
@@ -65,7 +52,6 @@ void FrameIDFilter::clear() {
 bool FrameIDFilter::match(uint32_t frame_id) {
     for (size_t i = 0; i < len_; i++) {
         if (items_[i] == frame_id) {
-            Serial.print("matched "); Serial.println(frame_id, HEX);
             return mode_ != FilterMode::ALLOW;
         }
     }
