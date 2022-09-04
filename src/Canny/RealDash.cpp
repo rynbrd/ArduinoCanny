@@ -1,6 +1,7 @@
 #include "RealDash.h"
 
 #include <Arduino.h>
+#include <CRC32.h>
 #include "Frame.h"
 
 namespace Canny {
@@ -136,8 +137,8 @@ bool RealDash::validateChecksum() {
         if (read_size_ - 8 - frame_.size() < 4) {
             return false;
         }
-        if (frame66_checksum_.finalize() != *((uint32_t*)checksum_buffer_)) {
-            //ERROR_MSG_VAL_FMT("realdash: frame 0x66 checksum error, wanted ", frame66_checksum_.finalize(), HEX);
+        if (frame66_checksum_.value() != *((uint32_t*)checksum_buffer_)) {
+            //ERROR_MSG_VAL_FMT("realdash: frame 0x66 checksum error, wanted ", frame66_checksum_.value(), HEX);
             reset();
             return false;
         }
@@ -170,6 +171,10 @@ void RealDash::writeBytes(const byte* b, uint8_t len) {
 }
 
 void RealDash::writeBytes(uint32_t data) {
+    //uint8_t* buf = (uint8_t*)&data;
+    //for (int i = 3; i >= 0; --i) {
+    //    writeByte(buf[i]);
+    //}
     writeBytes((const byte*)&data, 4);
 }
 
@@ -180,6 +185,18 @@ Error RealDash::write(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size) {
     if (size > 64 || size % 4 != 0) {
         return ERR_INVALID;
     }
+
+    uint8_t test_data[] = {
+        0x66, 0x33, 0x22, 0x11, 0x20, 0x00, 0x00, 0x00,
+        0x0E, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    };
+
+    Serial.println("----");
+    Serial.print("rd checksum: ");
+    Serial.println(Crc32(test_data, 16), HEX);
+    Serial.print("my checksum: ");
+    Serial.println(CRC32::calculate(test_data, 16), HEX);
+    Serial.println("----");
 
     write_checksum_.reset();
 
@@ -195,13 +212,15 @@ Error RealDash::write(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size) {
     for (int i = 0; i < 8-size; i++) {
         writeByte(0);
     }
-    uint32_t checksum = write_checksum_.finalize();
+    uint32_t checksum = write_checksum_.value();
+    Serial.print("realdash checksum: "); Serial.println(checksum, HEX);
     stream_->write((const byte*)&checksum, 4);
     stream_->flush();
     return Error::ERR_OK;
 }
 
 Error RealDash::write(const Frame& frame) {
+    Serial.print("realdash frame: "); Serial.println(frame);
     return write(frame.id(), frame.ext(), frame.data(), frame.size());
 }
 
