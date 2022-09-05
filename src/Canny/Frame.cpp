@@ -36,9 +36,7 @@ void Frame::id(uint32_t id, uint8_t ext) {
 
 void Frame::data(const uint8_t* data, uint8_t len) {
     resize(len);
-    for (size_t i = 0; i < len; i++) {
-        data_[i] = data[i];
-    }
+    memcpy(data_, data, len);
 }
 
 
