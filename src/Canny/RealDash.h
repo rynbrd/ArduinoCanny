@@ -27,7 +27,7 @@ class RealDash : public Connection {
         Error read(Frame* frame) override;
 
         // Write a frame to the RealDash stream. Return ERR_OK on success.
-        Error write(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size) override;
+        Error write(uint32_t id, uint8_t /*ext*/, uint8_t* data, uint8_t size) override;
 
         // A variant of write()  that operates on a Frame object.
         virtual Error write(const Frame& frame) override;

@@ -174,7 +174,7 @@ void RealDash::writeBytes(uint32_t data) {
     writeBytes((const byte*)&data, 4);
 }
 
-Error RealDash::write(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size) {
+Error RealDash::write(uint32_t id, uint8_t, uint8_t* data, uint8_t size) {
     if (!stream_) {
         return ERR_FIFO;
     }
