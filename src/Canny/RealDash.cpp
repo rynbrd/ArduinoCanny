@@ -198,7 +198,6 @@ Error RealDash::write(uint32_t id, uint8_t, uint8_t* data, uint8_t size) {
     }
     uint32_t checksum = write_checksum_.value();
     stream_->write((const byte*)&checksum, 4);
-    stream_->flush();
     return Error::ERR_OK;
 }
 
