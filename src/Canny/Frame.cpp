@@ -8,7 +8,7 @@ Frame::Frame() : id_(0), ext_(0), size_(0), capacity_(0), data_(nullptr) {}
 
 Frame::Frame(const Frame& frame) :
         id_(frame.id_), ext_(frame.ext_),
-        size_(frame.size_), capacity_(frame.capacity_),
+        size_(frame.size_), capacity_(frame.size_),
         data_(new uint8_t[capacity_]) {
     memcpy(data_, frame.data_, capacity_);
 }
