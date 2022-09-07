@@ -59,32 +59,6 @@ class Connection {
         virtual Error write(const Frame& frame) = 0;
 };
 
-// A connection which wraps another connection and filters reads and writes.
-class FilteredConnection : public Connection {
-    public:
-        FilteredConnection(Connection* child) : child_(child) {}
-
-        // Read af rame. Return ERR_FIFO for filtered frames or the result of
-        // the child's read call.
-        Error read(uint32_t* id, uint8_t* ext, uint8_t* data, uint8_t* size) override;
-        Error read(Frame* frame) override;
-
-        // Write a frame. Return ERR_OK if it was filtered or the result of the
-        // child's write call.
-        Error write(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size) override;
-        Error write(const Frame& frame) override;
-
-        // Return true for frames which should be returned by calls to read().
-        virtual bool readFilter(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size) const = 0;
-
-        // Return true for frames which should be written to the child.
-        virtual bool writeFilter(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size) const = 0;
-
-    private:
-        Connection* child_;
-};
-
-
 }  // namespace Canny
 
 #endif  // _CANNY_CONNECTION_H_
