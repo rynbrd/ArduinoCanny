@@ -4,21 +4,22 @@
 
 namespace Canny {
 
-Frame::Frame() : id_(0), ext_(0), size_(0), capacity_(0), data_(nullptr) {}
+Frame::Frame() : id_(0), ext_(0), size_(0), capacity_(0), pad_(0x00), data_(nullptr) {}
 
 Frame::Frame(const Frame& frame) :
         id_(frame.id_), ext_(frame.ext_),
         size_(frame.size_), capacity_(frame.size_),
-        data_(new uint8_t[capacity_]) {
+        pad_(frame.pad_), data_(new uint8_t[capacity_]) {
     memcpy(data_, frame.data_, capacity_);
 }
 
-Frame::Frame(uint8_t capacity) : Frame() {
+Frame::Frame(uint8_t capacity, uint8_t pad) :
+        id_(0), ext_(0), size_(0), capacity_(0), pad_(pad), data_(nullptr) {
     reserve(capacity);
 }
 
-Frame::Frame(uint32_t id, uint8_t ext, uint8_t size, uint8_t capacity) :
-        id_(id), ext_(ext), size_(size), capacity_(0), data_(nullptr) {
+Frame::Frame(uint32_t id, uint8_t ext, uint8_t size, uint8_t capacity, uint8_t pad) :
+        id_(id), ext_(ext), size_(size), capacity_(0), pad_(pad), data_(nullptr) {
     reserve(max(size, capacity));
 }
 
@@ -48,22 +49,30 @@ void Frame::reserve(uint8_t capacity) {
     uint8_t* new_data = new uint8_t[capacity];
     if (data_ != nullptr) {
         memcpy(new_data, data_, capacity_);
-        memset(new_data+capacity_, 0, capacity-capacity_);
+        memset(new_data+capacity_, pad_, capacity-capacity_);
         delete[] data_;
     } else {
-        memset(new_data, 0, capacity);
+        memset(new_data, pad_, capacity);
     }
     capacity_ = capacity;
     data_ = new_data;
 }
 
 void Frame::resize(uint8_t size) {
+    if (size < capacity_) {
+        memset(data_+size, pad_, capacity_-size);
+    }
     reserve(size);
     size_ = size;
 }
 
-void Frame::clear(uint8_t fill) {
-    memset(data_, fill, capacity_);
+void Frame::clear() {
+    memset(data_, pad_, capacity_);
+}
+
+void Frame::clear(uint8_t pad) {
+    pad_ = pad;
+    clear();
 }
 
 size_t Frame::printTo(Print& p) const {

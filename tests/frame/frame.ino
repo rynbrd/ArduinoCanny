@@ -164,7 +164,7 @@ test(ReserveTest, MoreCapacity) {
 
 test(ResizeTest, LessSize) {
     Frame f(0x123, 0, {0x1A, 0x2B, 0x4C, 0x5D});
-    uint8_t expect_data[4] = {0x1A, 0x2B, 0x4C, 0x5D};
+    uint8_t expect_data[4] = {0x1A, 0x2B, 0x00, 0x00};
     f.resize(2);
 
     assertEqual(f.id(), 0x123u);

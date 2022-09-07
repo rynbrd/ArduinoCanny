@@ -16,17 +16,19 @@ class Frame : public Printable {
         Frame(const Frame& frame);
 
         // Construct an empty CAN frame with the specified capacity.
-        explicit Frame(uint8_t capacity);
+        explicit Frame(uint8_t capacity, uint8_t pad=0x00);
 
         // Construct a CAN frame with the provided values and capacity.
         // Capacity is set to size if no capacity is provided.
-        Frame(uint32_t id, uint8_t ext, uint8_t size, uint8_t capacity=0);
+        Frame(uint32_t id, uint8_t ext, uint8_t size,
+                uint8_t capacity=0, uint8_t pad=0x00);
 
         // Construct a CAN frame with the provided values, data, and capacity.
         // The size is set to the length of data. Capacity is set to size if no
         // capacity is provided.
         template <size_t N> 
-        Frame(uint32_t id, uint8_t ext, const uint8_t (&data)[N], uint8_t capacity=0);
+        Frame(uint32_t id, uint8_t ext, const uint8_t (&data)[N],
+                uint8_t capacity=0, uint8_t pad=0x00);
 
         // Free's the memory pointed to by data if the frame owns that memory.
         virtual ~Frame();
@@ -92,8 +94,12 @@ class Frame : public Printable {
         // does not reduce its capacity.
         void resize(uint8_t size);
 
-        // Clear the frame data. Its bytes set to the given fill value.
-        void clear(uint8_t fill);
+        // Clear the frame data. Its bytes are set to the stored pad value.
+        void clear();
+
+        // Clear the frame data and upate the pad value. The frame bytes set to
+        // the new pad value.
+        void clear(uint8_t pad);
 
         // Write a human readable string representation of the frame to a
         // print object. Return the number of bytes written. Implements
@@ -116,6 +122,8 @@ class Frame : public Printable {
         // The capacity of the frame. This should generally be 8 for CAN 2.0
         // frames and 64 for CAN FD frames.
         uint8_t capacity_;
+        // The byte to pad extra capacity with.
+        uint8_t pad_;
         // The data transmitted with this frame.
         uint8_t* data_;
 
@@ -132,14 +140,14 @@ bool operator==(const Frame& left, const Frame& right);
 bool operator!=(const Frame& left, const Frame& right);
 
 template <size_t N> 
-Frame::Frame(uint32_t id, uint8_t ext, const uint8_t (&data)[N], uint8_t capacity) :
+Frame::Frame(uint32_t id, uint8_t ext, const uint8_t (&data)[N], uint8_t capacity, uint8_t pad) :
         id_(id), ext_(ext), size_(sizeof(data)),
         capacity_(max((uint8_t)sizeof(data), capacity)),
-        data_(new uint8_t[capacity_]) {
+        pad_(pad), data_(new uint8_t[capacity_]) {
     for (size_t i = 0; i < sizeof(data); i++) {
         data_[i] = data[i];
     }
-    memset(data_+size_, 0, capacity_-size_);
+    memset(data_+size_, pad_, capacity_-size_);
 }
 
 template <size_t N> 
