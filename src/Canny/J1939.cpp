@@ -2,7 +2,7 @@
 
 #include <Canny.h>
 
-namespace Canny::J1939 {
+namespace Canny {
 namespace {
 
 // Return true if a PGN is PDU1.
@@ -19,24 +19,24 @@ size_t printByte(Print& p, uint8_t byte) {
 
 }  // namespace
 
-Message::Message() : Frame(0x1C0000FF, 1, 0, 0, 0xFF) {}
+J1939Message::J1939Message() : Frame(0x1C0000FF, 1, 0, 0, 0xFF) {}
 
-Message::Message(uint32_t pgn, uint8_t sa, uint8_t da, uint8_t priority) :
+J1939Message::J1939Message(uint32_t pgn, uint8_t sa, uint8_t da, uint8_t priority) :
     Frame(((priority & 0x07) << 26) | (pgn << 8) | sa | (PDU1(pgn) ? da << 8 : 0x00), 1, 0, 0, 0xFF) {}
 
-uint8_t Message::priority() const {
+uint8_t J1939Message::priority() const {
     return (id() >> 26) & 0x07; 
 }
 
-void Message::priority(uint8_t priority) {
+void J1939Message::priority(uint8_t priority) {
     id((id() & 0xE3FFFFFF) | ((priority & 0x07) << 26));
 }
 
-bool Message::reserved() const {
+bool J1939Message::reserved() const {
     return (id() & 0x02000000) == 0x02000000;
 }
 
-void Message::reserved(bool reserved) {
+void J1939Message::reserved(bool reserved) {
     if (reserved) {
         id(id() | 0x02000000);
     } else {
@@ -44,11 +44,11 @@ void Message::reserved(bool reserved) {
     }
 }
 
-bool Message::data_page() const {
+bool J1939Message::data_page() const {
     return (id() & 0x01000000) == 0x01000000;
 }
 
-void Message::data_page(bool data_page) {
+void J1939Message::data_page(bool data_page) {
     if (data_page) {
         id(id() | 0x01000000);
     } else {
@@ -56,57 +56,57 @@ void Message::data_page(bool data_page) {
     }
 }
 
-uint8_t Message::pdu_format() const {
+uint8_t J1939Message::pdu_format() const {
     return id() >> 16 & 0xFF;
 }
 
-void Message::pdu_format(uint8_t pf) {
+void J1939Message::pdu_format(uint8_t pf) {
     id((id() & 0xFF00FFFF) | (pf << 16));
 }
 
-uint8_t Message::pdu_specific() const {
+uint8_t J1939Message::pdu_specific() const {
     return id() >> 8 & 0xFF;
 }
 
-void Message::pdu_specific(uint8_t ps) {
+void J1939Message::pdu_specific(uint8_t ps) {
     id((id() & 0xFFFF00FF) | (ps << 8));
 }
 
-uint8_t Message::group_extension() const {
+uint8_t J1939Message::group_extension() const {
     if (pdu_format() >= 240) {
         return pdu_specific();
     }
     return 0x00;
 }
 
-void Message::group_extension(uint8_t ge) {
+void J1939Message::group_extension(uint8_t ge) {
     if (pdu_format() >= 240) {
         pdu_specific(ge);
     }
 }
 
-uint8_t Message::dest_address() const {
+uint8_t J1939Message::dest_address() const {
     if (pdu_format() < 240) {
         return pdu_specific();
     }
     return 0xFF;
 }
 
-void Message::dest_address(uint8_t da) {
+void J1939Message::dest_address(uint8_t da) {
     if (pdu_format() < 240) {
         pdu_specific(da);
     } 
 }
 
-uint8_t Message::source_address() const {
+uint8_t J1939Message::source_address() const {
     return id() & 0xFF;
 }
 
-void Message::source_address(uint8_t sa) {
+void J1939Message::source_address(uint8_t sa) {
     id((id() & 0xFFFFFF00) | sa);
 }
 
-uint32_t Message::pgn() const {
+uint32_t J1939Message::pgn() const {
     uint32_t pgn = pdu_specific() | (pdu_format() << 8) | (data_page() << 9) | (reserved() << 10);
     if (PDU1(pgn)) {
         pgn &= 0xFFFFFF00;
@@ -114,7 +114,7 @@ uint32_t Message::pgn() const {
     return pgn;
 }
 
-void Message::pgn(uint32_t pgn) {
+void J1939Message::pgn(uint32_t pgn) {
     if (PDU1(pgn)) {
         id((id() & 0xFC00FFFF) | ((pgn << 8) & 0x03FF0000));
     } else {
@@ -122,15 +122,15 @@ void Message::pgn(uint32_t pgn) {
     }
 }
 
-bool Message::broadcast() const {
+bool J1939Message::broadcast() const {
     return pdu_format() >= 240 || pdu_specific() == BroadcastAddress;
 }
 
-bool Message::valid() const {
+bool J1939Message::valid() const {
     return ext() == 1 && size() <= 8;
 }
 
-size_t Message::printTo(Print& p) const {
+size_t J1939Message::printTo(Print& p) const {
     int n = p.print(priority(), HEX);
     n += p.print("(");
     n += printByte(p, source_address());
@@ -159,4 +159,4 @@ size_t Message::printTo(Print& p) const {
     return n;
 }
 
-}  // namespace Canny::J1939
+}  // namespace Canny

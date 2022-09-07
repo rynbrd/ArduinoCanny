@@ -4,11 +4,11 @@
 
 using namespace aunit;
 
-namespace Canny::J1939 {
+namespace Canny {
 
-test(MessageTest, ConstructBroadcast) {
+test(J1939MessageTest, ConstructBroadcast) {
     // Broadcast PDU.
-    Message msg(0xFF12, 0x31);
+    J1939Message msg(0xFF12, 0x31);
 
     // 000 111 0 0 1111111100010010 00110001
     assertEqual(msg.id(), (uint32_t)0x1CFF1231);
@@ -27,9 +27,9 @@ test(MessageTest, ConstructBroadcast) {
     assertEqual(msg.valid(), true);
 }
 
-test(MessageTest, ConstructAddressable) {
+test(J1939MessageTest, ConstructAddressable) {
     // P2P PDU with priority of 1.
-    Message msg(0xEF00, 0x31, 0x42, 0x01);
+    J1939Message msg(0xEF00, 0x31, 0x42, 0x01);
 
     // 000 001 0 0 1110111101000010 00110001
     assertEqual(msg.id(), (uint32_t)0x04EF4231);
@@ -48,8 +48,8 @@ test(MessageTest, ConstructAddressable) {
     assertEqual(msg.valid(), true);
 }
 
-test(MessageTest, Setters) {
-    Message msg(0xFF12, 0x31);
+test(J1939MessageTest, Setters) {
+    J1939Message msg(0xFF12, 0x31);
     assertEqual(msg.id(), (uint32_t)0x1CFF1231);
 
     // 000 001 0 0 11111111 00010010 00110001
@@ -110,11 +110,9 @@ test(MessageTest, Setters) {
     assertEqual(msg.id(), (uint32_t)0x04EF5532);
     assertEqual(msg.pdu_specific(), 0x55);
     assertEqual(msg.dest_address(), 0x55);
-
-    Serial.println(msg);
 }
 
-}
+}  // namespace Canny
 
 // Test boilerplate.
 void setup() {

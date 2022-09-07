@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include <Canny.h>
 
-namespace Canny::J1939 {
+namespace Canny {
 
 // The J1939 null address. Used during address claim by devices that have not
 // yet claimed an address.
@@ -16,17 +16,17 @@ const uint8_t BroadcastAddress = 255;
 
 // A J1939 message. All J1939 messages are CAN frames with an extended ID space
 // and an 8-byte payload.
-class Message : public Frame {
+class J1939Message : public Frame {
     public:
         // Construct an empty message with no capacity. Its data is set to
         // nullptr and its capacity to 0. Priority defaults to 111b, PGN to
         // 0, and SA to the null address.
-        Message();
+        J1939Message();
 
         // Construct an empty message with the given PGN, Source Address,
         // Destination Address, and Priority. The DA value is ignored for PDU2
         // PGNs. Priority defaults to 111b.
-        Message(uint32_t pgn, uint8_t sa, uint8_t da = 0x00, uint8_t priority = 0x07);
+        J1939Message(uint32_t pgn, uint8_t sa, uint8_t da = 0x00, uint8_t priority = 0x07);
 
         // Return the Priority value.
         uint8_t priority() const;
@@ -109,6 +109,6 @@ class Message : public Frame {
         size_t printTo(Print& p) const override;
 };
 
-}  // namespace Canny::J1939
+}  // namespace Canny
 
 #endif  // _CANNY_J1939_H_
