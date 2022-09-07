@@ -87,7 +87,11 @@ Bitrate MCP2518::bitrate() const {
 }
 
 Error MCP2518::read(Frame* frame) {
-    frame->reserve(64);
+    if (mode_ == CAN20) {
+        frame->reserve(8);
+    } else {
+        frame->reserve(64);
+    }
     return read(frame->mutable_id(), frame->mutable_ext(), frame->data(), frame->mutable_size());
 }
 
