@@ -6,5 +6,6 @@
 #include <Canny/Filter.h>
 #include <Canny/Frame.h>
 #include <Canny/J1939.h>
+#include <Canny/Queue.h>
 
 #endif  // _CANNY_H_
