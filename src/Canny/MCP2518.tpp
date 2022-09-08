@@ -87,51 +87,40 @@ Bitrate MCP2518::bitrate() const {
 }
 
 Error MCP2518::read(Frame* frame) {
+    if (!ready_) {
+        return ERR_READY;
+    }
+
     if (mode_ == CAN20) {
         frame->reserve(8);
     } else {
         frame->reserve(64);
     }
-    return read(frame->mutable_id(), frame->mutable_ext(), frame->data(), frame->mutable_size());
-}
 
-Error MCP2518::read(uint32_t* id, uint8_t* ext, uint8_t* data, uint8_t* size) {
-    if (!ready_) {
-        return ERR_READY;
-    }
     if (mcp_.checkReceive() != CAN_MSGAVAIL) {
         return ERR_FIFO;
     }
-    if (mcp_.readMsgBuf(size, data) != CAN_OK) {
+    if (mcp_.readMsgBuf(frame->mutable_size(), frame->data()) != CAN_OK) {
         return ERR_INTERNAL;
     }
-    *id = mcp_.getCanId();
-    if (ext != nullptr) {
-        *ext = mcp_.isExtendedFrame();
-    }
+    frame->id(mcp_.getCanId());
+    frame->ext(mcp_.isExtendedFrame());
     return ERR_OK;
 }
 
 Error MCP2518::write(const Frame& frame) {
-    return write(frame.id(), frame.ext(), frame.data(), frame.size());
-}
-
-Error MCP2518::write(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size) {
     if (!ready_) {
         return ERR_READY;
     }
-    if (data == nullptr || (mode_ == CAN20 && size > 8) ||
-            ((mode_ == CANFD_CONST_RATE || mode_ == CANFD_DUAL_RATE) && size > 64)) {
+    if (frame.data() == nullptr || (mode_ == CAN20 && frame.size() > 8) || frame.size() > 64) {
         return ERR_INVALID;
     }
-    if (ext > 1)  {
-        ext = 1;
-    }
 
+    uint8_t size = frame.size();
     if (mode_ == CANFD_CONST_RATE || mode_ == CANFD_DUAL_RATE) {
         size = CANFD::len2dlc(size);
     }
-    if (mcp_.sendMsgBuf(id, ext, size, data) == CAN_OK) {
+    if (mcp_.sendMsgBuf(frame.id(), frame.ext(), size, frame.data()) == CAN_OK) {
         return ERR_OK;
     }
     return ERR_INTERNAL;

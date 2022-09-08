@@ -72,16 +72,12 @@ Bitrate MCP2515::bitrate() const {
 }
 
 Error MCP2515::read(Frame* frame) {
-    frame->reserve(8);
-    return read(frame->mutable_id(), frame->mutable_ext(), frame->data(), frame->mutable_size());
-}
-
-Error MCP2515::read(uint32_t* id, uint8_t* ext, uint8_t* data, uint8_t* size) {
     if (!ready_) {
         return ERR_READY;
     }
+    frame->reserve(8);
 
-    switch (mcp_.readMsgBufID(id, size, data)) {
+    switch (mcp_.readMsgBufID(frame->mutable_id(), frame->mutable_size(), frame->data())) {
         case CAN_OK:
             break;
         case CAN_NOMSG:
@@ -89,28 +85,19 @@ Error MCP2515::read(uint32_t* id, uint8_t* ext, uint8_t* data, uint8_t* size) {
         default:
             return ERR_INTERNAL;
     }
-    if (ext != nullptr) {
-        *ext = mcp_.isExtendedFrame();
-    }
+    frame->ext(mcp_.isExtendedFrame());
     return ERR_OK;
 }
 
 Error MCP2515::write(const Frame& frame) {
-    return write(frame.id(), frame.ext(), frame.data(), frame.size());
-}
-
-Error MCP2515::write(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size) {
     if (!ready_) {
         return ERR_READY;
     }
-    if (data == nullptr || size > 8) {
+    if (frame.data() == nullptr || frame.size() > 8) {
         return ERR_INVALID;
     }
-    if (ext > 1) {
-        ext = 1;
-    }
 
-    switch(mcp_.sendMsgBuf(id, ext, size, data)) {
+    switch(mcp_.sendMsgBuf(frame.id(), frame.ext(), frame.size(), frame.data())) {
         case CAN_OK:
             return ERR_OK;
         case CAN_GETTXBFTIMEOUT:

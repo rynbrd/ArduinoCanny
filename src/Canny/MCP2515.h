@@ -21,9 +21,7 @@ class MCP2515 : public Controller {
         Mode mode() const override;
         Bitrate bitrate() const override;
         Error read(Frame* frame) override;
-        Error read(uint32_t* id, uint8_t* ext, uint8_t* data, uint8_t* size) override;
         Error write(const Frame& frame) override;
-        Error write(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size) override;
     private:
         MCP_CAN mcp_;
         bool ready_;
