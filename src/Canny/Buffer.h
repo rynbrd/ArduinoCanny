@@ -1,7 +1,7 @@
 #ifndef _CANNY_BUFFER_H_
 #define _CANNY_BUFFER_H_
 
-#include "Arduino.h"
+#include <Arduino.h>
 #include "Connection.h"
 #include "Queue.h"
 
@@ -56,12 +56,12 @@ class BufferedConnection : public Connection {
 
         // Called by read() when a read error occurs. Only non-FIFO errors are
         // handled by this method.
-        virtual void onReadError(Error) {}
+        virtual void onReadError(Error) const {}
 
         // Called by write() when a frame is discarded due to a write error.
         // Error is ERR_FIFO when the write buffer is full and the frame must
         // be discarded.
-        virtual void onWriteError(Error, const Frame&) {}
+        virtual void onWriteError(Error, const Frame&) const {}
 
     private:
         void fillReadBuffer();
