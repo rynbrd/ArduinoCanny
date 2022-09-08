@@ -29,18 +29,6 @@ void RealDash::updateChecksum(byte b) {
     }
 }
 
-Error RealDash::read(uint32_t* id, uint8_t* ext, uint8_t* data, uint8_t* size) {
-    if (stream_ && readHeader() && readId() && readData() && validateChecksum()) {
-        *id = frame_.id();
-        *ext = frame_.ext();
-        memcpy(data, frame_.data(), frame_.size());
-        *size = frame_.size();
-        reset();
-        return Error::ERR_OK;
-    }
-    return Error::ERR_FIFO;
-}
-
 Error RealDash::read(Frame* frame) {
     if (stream_ && readHeader() && readId() && readData() && validateChecksum()) {
         *frame = frame_;
@@ -174,35 +162,29 @@ void RealDash::writeBytes(uint32_t data) {
     writeBytes((const byte*)&data, 4);
 }
 
-Error RealDash::write(uint32_t id, uint8_t, uint8_t* data, uint8_t size) {
+Error RealDash::write(const Frame& frame) {
     if (!stream_) {
         return ERR_FIFO;
     }
-    if (size > 64 || size % 4 != 0) {
+    if (frame.size() > 64 || frame.size() % 4 != 0) {
         return ERR_INVALID;
     }
 
     write_checksum_.reset();
 
-    byte encoded_size = (size < 8 ? 8 : size) / 4 + 15;
+    byte encoded_size = (frame.size() < 8 ? 8 : frame.size()) / 4 + 15;
     writeByte(0x66);
     writeByte(0x33);
     writeByte(0x22);
     writeByte(encoded_size);
-    writeBytes(id);
-    if (data != nullptr) {
-        writeBytes(data, size);
-    }
-    for (int i = 0; i < 8-size; i++) {
+    writeBytes(frame.id());
+    writeBytes(frame.data(), frame.size());
+    for (int i = 0; i < 8-frame.size(); i++) {
         writeByte(0);
     }
     uint32_t checksum = write_checksum_.value();
     stream_->write((const byte*)&checksum, 4);
     return Error::ERR_OK;
-}
-
-Error RealDash::write(const Frame& frame) {
-    return write(frame.id(), frame.ext(), frame.data(), frame.size());
 }
 
 }  // namespace Canny

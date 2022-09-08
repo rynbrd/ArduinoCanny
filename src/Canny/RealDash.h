@@ -21,15 +21,9 @@ class RealDash : public Connection {
         //
         // The ext flag is always set to 1. RealDash encodes all frame IDs as 4
         // bytes and does not provide an ext flag.
-        Error read(uint32_t* id, uint8_t* ext, uint8_t* data, uint8_t* size) override;
-
-        // A variant of read() that operates on a Frame object.
         Error read(Frame* frame) override;
 
         // Write a frame to the RealDash stream. Return ERR_OK on success.
-        Error write(uint32_t id, uint8_t /*ext*/, uint8_t* data, uint8_t size) override;
-
-        // A variant of write()  that operates on a Frame object.
         virtual Error write(const Frame& frame) override;
 
     private:

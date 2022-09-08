@@ -3,7 +3,7 @@
 
 namespace Canny {
 
-// A fixed-size queue for buffering frames.
+// A fixed-size queue for buffering frames and their subtypes.
 template <typename Frame>
 class Queue {
     public:
