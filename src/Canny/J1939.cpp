@@ -134,7 +134,7 @@ size_t J1939Message::printTo(Print& p) const {
     int n = p.print(priority(), HEX);
     n += p.print("(");
     n += printByte(p, source_address());
-    n += Serial.print("->");
+    n += p.print("->");
     if (pdu_format() < 240) {
         n += printByte(p, pdu_specific());
     } else {
@@ -151,9 +151,9 @@ size_t J1939Message::printTo(Print& p) const {
         }
     }
     for (uint8_t i = size(); i < 8; ++i) {
-        n += Serial.print("FF");
+        n += p.print("FF");
         if (i < 7) {
-            n += Serial.print(":");
+            n += p.print(":");
         }
     }
     return n;
