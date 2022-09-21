@@ -18,9 +18,9 @@ class SAME51 : public Controller {
         Mode mode() const override;
         Bitrate bitrate() const override;
         Error read(Frame* frame) override;
-        Error read(uint32_t* id, uint8_t* ext, uint8_t* data, uint8_t* size) override;
+        Error read(uint32_t* id, uint8_t* ext, uint8_t* data, uint8_t* size);
         Error write(const Frame& frame) override;
-        Error write(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size) override;
+        Error write(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size);
     private:
         SAME51_CAN same51_;
         bool ready_;
