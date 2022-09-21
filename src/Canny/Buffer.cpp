@@ -7,28 +7,19 @@ namespace Canny {
 
 Error BufferedConnection::read(Frame* frame) {
     if (!read_queue_.empty()) {
-        Serial.println("read: buffer available");
         *frame = *read_queue_.dequeue();
     } else {
-        Serial.println("read: buffer empty");
         Error err;
         do {
             err = child_->read(frame);
             if (err != ERR_OK) {
                 if (err != ERR_FIFO) {
                     onReadError(err);
-                    Serial.println("read: error");
-                } else {
-                    Serial.println("read: nothing to read");
                 }
                 return ERR_FIFO;
             }
-            if (!readFilter(*frame)) {
-                Serial.print("read: filter frame: "); Serial.println(*frame);
-            } 
         } while(!readFilter(*frame));
     }
-    Serial.print("read: got frame: "); Serial.println(*frame);
     fillReadBuffer();
     return ERR_OK;
 }
@@ -75,23 +66,16 @@ void BufferedConnection::flush() {
 void BufferedConnection::fillReadBuffer() {
     Frame* frame;
     Error err;
-    Serial.println("buffer: reading");
     while ((frame = read_queue_.alloc()) != nullptr) {
-        Serial.println("buffer: pointer allocated");
         err = child_->read(frame);
         if (err == ERR_FIFO) {
-            Serial.println("  nothing to read");
             break;
         } else if (err != ERR_OK) {
-            Serial.println("  read error");
             onReadError(err);
             break;
         }
         if (readFilter(*frame)) {
-            Serial.print("  buffered frame: ");Serial.println(*frame);
             read_queue_.enqueue(*frame);
-        } else {
-            Serial.print("  filtered frame: ");Serial.println(*frame);
         }
     }
 }
