@@ -10,14 +10,47 @@ bool PDU1(uint32_t pgn) {
     return ((pgn >> 8) & 0xFF) < 240;
 }
 
-size_t printByte(Print& p, uint8_t byte) {
-    if (byte <= 0x0F) {
-        return p.print("0") + p.print(byte, HEX);
-    }
-    return p.print(byte, HEX);
+}  // namespace
+
+uint32_t j1939_name_identifier(uint64_t name) {
+    return (name & 0xFFFFF80000000000) >> 43;
 }
 
-}  // namespace
+uint16_t j1939_name_manufacturer_code(uint64_t name) {
+    return (name & 0x000007FF00000000) >> 32;
+}
+
+uint8_t j1939_name_ecu_instance(uint64_t name) {
+    return (name & 0x00000000E0000000) >> 29;
+}
+
+uint8_t j1939_name_function_instance(uint64_t name) {
+    return (name & 0x000000001F000000) >> 24;
+}
+
+uint8_t j1939_name_function(uint64_t name) {
+    return (name & 0x0000000000FF0000) >> 16;
+}
+
+bool j1939_name_reserved(uint64_t name) {
+    return (name & 0x0000000000008000) >> 15;
+}
+
+uint8_t j1939_name_vehicle_system(uint64_t name) {
+    return (name & 0x0000000000007F00) >> 8;
+}
+
+uint8_t j1939_name_vehicle_system_instance(uint64_t name) {
+    return (name & 0x00000000000000F0) >> 4;
+}
+
+uint8_t j1939_name_industry_group(uint64_t name) {
+    return (name & 0x000000000000000E) >> 1;
+}
+
+bool j1939_name_arbitrary_address(uint64_t name) {
+    return name & 0x00000000000000001;
+}
 
 J1939Message::J1939Message() : Frame(0x1C0000FF, 1, 0, 0, 0xFF) {}
 
@@ -131,28 +164,15 @@ bool J1939Message::valid() const {
 }
 
 size_t J1939Message::printTo(Print& p) const {
-    int n = p.print(priority(), HEX);
-    n += p.print("(");
-    n += printByte(p, source_address());
-    n += p.print("->");
-    if (pdu_format() < 240) {
-        n += printByte(p, pdu_specific());
-    } else {
-        n += p.print("FF");
-    }
-    n += p.print(")");
-    n += p.print(pgn(), HEX);
+    size_t n = 0;
+    n += p.print(id(), HEX);
     n += p.print("#");
-
-    for (uint8_t i = 0; i < size(); i++) {
-        n += printByte(p, data()[i]);
-        if (i < 7) {
-            n += p.print(":");
+    for (int i = 0; i < size(); i++) {
+        if (data()[i] <= 0x0F) {
+            n += p.print("0");
         }
-    }
-    for (uint8_t i = size(); i < 8; ++i) {
-        n += p.print("FF");
-        if (i < 7) {
+        n += p.print(data()[i], HEX);
+        if (i < size()-1) {
             n += p.print(":");
         }
     }

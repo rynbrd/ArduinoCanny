@@ -14,6 +14,36 @@ const uint8_t NullAddress = 254;
 // PDU1 messages.
 const uint8_t BroadcastAddress = 255;
 
+// Return the Identifier part of a J1939 NAME.
+uint32_t j1939_name_identifier(uint64_t name);
+
+// Return the Manufacturer Code part of a J1939 NAME.
+uint16_t j1939_name_manufacturer_code(uint64_t name);
+
+// Return the ECU Instance part of a J1939 NAME.
+uint8_t j1939_name_ecu_instance(uint64_t name);
+
+// Return the Function Instance part of a J1939 NAME.
+uint8_t j1939_name_function_instance(uint64_t name);
+
+// Return the Function part of a J1939 NAME.
+uint8_t j1939_name_function(uint64_t name);
+
+// Return the Reserved bit of a J1939 NAME.
+bool j1939_name_reserved(uint64_t name);
+
+// Return the Vehicle System part of a J1939 NAME.
+uint8_t j1939_name_vehicle_system(uint64_t name);
+
+// Return the Vehicle System Instance part of a J1939 NAME.
+uint8_t j1939_name_vehicle_system_instance(uint64_t name);
+
+// Return the Industry Group part of a J1939 NAME.
+uint8_t j1939_name_industry_group(uint64_t name);
+
+// Return the Arbitrary Address bit of a J1939 NAME.
+bool j1939_name_arbitrary_address(uint64_t name);
+
 // A J1939 message. All J1939 messages are CAN frames with an extended ID space
 // and an 8-byte payload.
 class J1939Message : public Frame {

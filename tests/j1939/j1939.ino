@@ -6,6 +6,66 @@ using namespace aunit;
 
 namespace Canny {
 
+test(J1939NameTest, Identifier) {
+    uint64_t name = 0x06876A340082FAC0;
+    uint32_t expect = 53485;
+    assertEqual(j1939_name_identifier(name), expect);
+}
+
+test(J1939NameTest, ManufacturerCode) {
+    uint64_t name = 0x06876A340082FAC0;
+    uint16_t expect = 564;
+    assertEqual(j1939_name_manufacturer_code(name), expect);
+}
+
+test(J1939NameTest, ECUInstance) {
+    uint64_t name = 0x06876A340082FAC0;
+    uint8_t expect = 0;
+    assertEqual(j1939_name_ecu_instance(name), expect);
+}
+
+test(J1939NameTest, FunctionInstance) {
+    uint64_t name = 0x06876A340082FAC0;
+    uint8_t expect = 0;
+    assertEqual(j1939_name_function_instance(name), expect);
+}
+
+test(J1939NameTest, Function) {
+    uint64_t name = 0x06876A340082FAC0;
+    uint8_t expect = 130;
+    assertEqual(j1939_name_function(name), expect);
+}
+
+test(J1939NameTest, Reserved) {
+    uint64_t name = 0x06876A340082FAC0;
+    bool expect = true;
+    assertEqual(j1939_name_reserved(name), expect);
+}
+
+test(J1939NameTest, VehicleSystem) {
+    uint64_t name = 0x06876A340082FAC0;
+    uint8_t expect = 122;
+    assertEqual(j1939_name_vehicle_system(name), expect);
+}
+
+test(J1939NameTest, VehicleSystemInstance) {
+    uint64_t name = 0x06876A340082FAC0;
+    uint8_t expect = 12;
+    assertEqual(j1939_name_vehicle_system_instance(name), expect);
+}
+
+test(J1939NameTest, IndustryGroup) {
+    uint64_t name = 0x06876A340082FAC0;
+    uint8_t expect = 0;
+    assertEqual(j1939_name_industry_group(name), expect);
+}
+
+test(J1939NameTest, ArbitraryAddress) {
+    uint64_t name = 0x06876A340082FAC1;
+    bool expect = true;
+    assertEqual(j1939_name_arbitrary_address(name), expect);
+}
+
 test(J1939MessageTest, ConstructBroadcast) {
     // Broadcast PDU.
     J1939Message msg(0xFF12, 0x31);
