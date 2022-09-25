@@ -58,6 +58,12 @@ class J1939Message : public Frame {
         // PGNs. Priority defaults to 111b.
         J1939Message(uint32_t pgn, uint8_t sa, uint8_t da = 0x00, uint8_t priority = 0x07);
 
+        // Set the message data to a J1939 name.
+        void name(uint64_t name);
+
+        // Return the message data as a J1939 name.
+        uint64_t name() const;
+
         // Return the Priority value.
         uint8_t priority() const;
 
