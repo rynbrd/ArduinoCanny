@@ -172,6 +172,17 @@ test(J1939MessageTest, Setters) {
     assertEqual(msg.dest_address(), 0x55);
 }
 
+test(J1939MessageTest, PGN) {
+    J1939Message msg;
+    msg.id(0x19F0140A);
+    msg.data({0x20, 0x86, 0x35, 0x08, 0x8E, 0x12, 0x4D, 0x53});
+    assertEqual(msg.pgn(), (uint32_t)0x1F014);
+    assertEqual(msg.pdu_format(), 0xF0);
+    assertEqual(msg.pdu_specific(), 0x14);
+    assertEqual(msg.dest_address(), 0xFF);
+    assertEqual(msg.source_address(), 0x0A);
+}
+
 }  // namespace Canny
 
 // Test boilerplate.

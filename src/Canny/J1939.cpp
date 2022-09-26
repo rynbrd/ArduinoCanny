@@ -174,7 +174,7 @@ void J1939Message::source_address(uint8_t sa) {
 }
 
 uint32_t J1939Message::pgn() const {
-    uint32_t pgn = pdu_specific() | (pdu_format() << 8) | (data_page() << 9) | (reserved() << 10);
+    uint32_t pgn = pdu_specific() | (pdu_format() << 8) | (data_page() << 16) | (reserved() << 17);
     if (PDU1(pgn)) {
         pgn &= 0xFFFFFF00;
     }
