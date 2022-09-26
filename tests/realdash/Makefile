@@ -2,7 +2,7 @@
 # Makefile to compile and run Arduino programs natively on Linux or MacOS.
 
 APP_NAME := realdash
-ARDUINO_LIBS := AUnit Canny CRC32 Faker
+ARDUINO_LIBS := AUnit Canny CRC32 Endian Faker
 EXTRA_CXXFLAGS += -g
 include ../../../EpoxyDuino/EpoxyDuino.mk
 

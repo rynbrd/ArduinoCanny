@@ -2,6 +2,7 @@
 
 #include <Arduino.h>
 #include <Canny.h>
+#include <Endian.h>
 
 namespace Canny {
 namespace {
@@ -9,14 +10,6 @@ namespace {
 // Return true if a PGN is PDU1.
 bool PDU1(uint32_t pgn) {
     return ((pgn >> 8) & 0xFF) < 240;
-}
-
-bool little_endian() {
-    union {
-        uint16_t a;
-        uint8_t b[2];
-    } endian = {0x0001};
-    return endian.b[0] == 0x01;
 }
 
 }  // namespace
@@ -68,28 +61,14 @@ J1939Message::J1939Message(uint32_t pgn, uint8_t sa, uint8_t da, uint8_t priorit
 
 void J1939Message::name(uint64_t name) {
     resize(8);
-    if (little_endian()) {
-        for (uint8_t i = 0; i < 8; ++i) {
-            data()[i] = (name >> (56 - 8*i)) & 0xFF;
-        }
-    } else {
-        memcpy(data(), &name, 8);
-    }
+    Endian::hlltonb(data(), name);
 }
 
 uint64_t J1939Message::name() const {
     if (size() < 8) {
         return 0;
     }
-    uint64_t name = 0;
-    if (little_endian()) {
-        for (uint8_t i = 0; i < 8; ++i) {
-            name |= (data()[i] << (56 - 8*i));
-        }
-    } else {
-        memcpy(&name, data(), 8);
-    }
-    return name;
+    return Endian::nbtohll(data());
 }
 
 uint8_t J1939Message::priority() const {
