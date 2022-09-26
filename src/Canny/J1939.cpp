@@ -1,5 +1,6 @@
 #include "J1939.h"
 
+#include <Arduino.h>
 #include <Canny.h>
 
 namespace Canny {
