@@ -2,8 +2,8 @@
 #define _CANNY_BUFFER_H_
 
 #include <Arduino.h>
+#include <Foundation.h>
 #include "Connection.h"
-#include "Queue.h"
 
 namespace Canny {
 
@@ -18,10 +18,7 @@ class BufferedConnection : public Connection {
                 Connection* child,
                 size_t read_buffer_size,
                 size_t write_buffer_size,
-                size_t frame_reserve_capacity = 0) :
-            child_(child),
-            read_queue_(read_buffer_size, frame_reserve_capacity),
-            write_queue_(write_buffer_size, frame_reserve_capacity) {}
+                size_t frame_reserve_capacity = 0);
 
         // Read a frame and populate the buffer while frames are available to
         // read from the child connection. Always returns the first frame in

@@ -1,9 +1,29 @@
 #include "Buffer.h"
 
+#include <Foundation.h>
 #include "Arduino.h"
-#include "Queue.h"
 
 namespace Canny {
+namespace {
+
+void initBufferFrame(Frame* frame, size_t capacity) {
+    frame->reserve(capacity);
+}
+
+}
+
+BufferedConnection::BufferedConnection(
+        Connection* child,
+        size_t read_buffer_size,
+        size_t write_buffer_size,
+        size_t frame_reserve_capacity) :
+    child_(child),
+    read_queue_(read_buffer_size,
+            frame_reserve_capacity == 0 ?  nullptr : initBufferFrame,
+            frame_reserve_capacity),
+    write_queue_(write_buffer_size,
+            frame_reserve_capacity == 0 ?  nullptr : initBufferFrame,
+            frame_reserve_capacity) {}
 
 Error BufferedConnection::read(Frame* frame) {
     if (!read_queue_.empty()) {
