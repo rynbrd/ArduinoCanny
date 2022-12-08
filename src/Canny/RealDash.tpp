@@ -1,18 +1,14 @@
-#include "RealDash.h"
-
-#include <Arduino.h>
-#include <CRC32.h>
-#include "Frame.h"
-
 namespace Canny {
 
 static const uint32_t kReceiveTimeout = 5000;
 
-RealDash::RealDash(Stream* stream) : stream_(stream), frame_(0, 1, 0, 8) {
+template <typename FrameType>
+RealDash<FrameType>::RealDash(Stream* stream) : stream_(stream), frame_(0, 1, 0, 8) {
     reset();
 }
 
-void RealDash::reset() {
+template <typename FrameType>
+void RealDash<FrameType>::reset() {
     memset(checksum_buffer_, 0, 4);
     frame_type_66_ = false;
     frame44_checksum_ = 0;
@@ -21,7 +17,8 @@ void RealDash::reset() {
     read_size_ = 0;
 }
 
-void RealDash::updateChecksum(byte b) {
+template <typename FrameType>
+void RealDash<FrameType>::updateChecksum(byte b) {
     if (frame_type_66_) {
         frame66_checksum_.update(b);
     } else {
@@ -29,7 +26,8 @@ void RealDash::updateChecksum(byte b) {
     }
 }
 
-Error RealDash::read(Frame* frame) {
+template <typename FrameType>
+Error RealDash<FrameType>::read(FrameType* frame) {
     if (stream_ && readHeader() && readId() && readData() && validateChecksum()) {
         *frame = frame_;
         reset();
@@ -38,7 +36,8 @@ Error RealDash::read(Frame* frame) {
     return Error::ERR_FIFO;
 }
 
-bool RealDash::readHeader() {
+template <typename FrameType>
+bool RealDash<FrameType>::readHeader() {
     byte b;
     while (stream_->available() && read_size_ < 4) {
         b = stream_->read();
@@ -82,7 +81,8 @@ bool RealDash::readHeader() {
     return read_size_ >= 4;
 }
 
-bool RealDash::readId() {
+template <typename FrameType>
+bool RealDash<FrameType>::readId() {
     uint32_t b;
     while (stream_->available() && read_size_ < 8) {
         b = stream_->read();
@@ -106,7 +106,8 @@ bool RealDash::readId() {
     return read_size_ >= 8;
 }
 
-bool RealDash::readData() {
+template <typename FrameType>
+bool RealDash<FrameType>::readData() {
     while (stream_->available() && read_size_ - 8 < frame_.size()) {
         frame_.data()[read_size_-8] = stream_->read();
         updateChecksum(frame_.data()[read_size_-8]);
@@ -116,7 +117,8 @@ bool RealDash::readData() {
     return read_size_ - 8 >= frame_.size();
 }
 
-bool RealDash::validateChecksum() {
+template <typename FrameType>
+bool RealDash<FrameType>::validateChecksum() {
     if (frame_type_66_) {
         while (stream_->available() && read_size_ - 8 - frame_.size() < 4) {
             checksum_buffer_[read_size_ - 8 - frame_.size()] = stream_->read();
@@ -147,22 +149,26 @@ bool RealDash::validateChecksum() {
     return true;
 }
 
-void RealDash::writeByte(const byte b) {
+template <typename FrameType>
+void RealDash<FrameType>::writeByte(const byte b) {
     stream_->write(b);
     write_checksum_.update(b);
 }
 
-void RealDash::writeBytes(const byte* b, uint8_t len) {
+template <typename FrameType>
+void RealDash<FrameType>::writeBytes(const byte* b, uint8_t len) {
     for (int i = 0; i < len; i++) {
         writeByte(b[i]);
     }
 }
 
-void RealDash::writeBytes(uint32_t data) {
+template <typename FrameType>
+void RealDash<FrameType>::writeBytes(uint32_t data) {
     writeBytes((const byte*)&data, 4);
 }
 
-Error RealDash::write(const Frame& frame) {
+template <typename FrameType>
+Error RealDash<FrameType>::write(const FrameType& frame) {
     if (!stream_) {
         return ERR_FIFO;
     }

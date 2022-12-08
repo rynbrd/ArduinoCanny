@@ -1,31 +1,16 @@
-#include "Buffer.h"
-
-#include <Foundation.h>
-#include "Arduino.h"
-
 namespace Canny {
-namespace {
 
-void initBufferFrame(Frame* frame, size_t capacity) {
-    frame->reserve(capacity);
-}
-
-}
-
-BufferedConnection::BufferedConnection(
-        Connection* child,
+template <typename FrameType>
+BufferedConnection<FrameType>::BufferedConnection(
+        Connection<FrameType>* child,
         size_t read_buffer_size,
-        size_t write_buffer_size,
-        size_t frame_reserve_capacity) :
+        size_t write_buffer_size) :
     child_(child),
-    read_queue_(read_buffer_size,
-            frame_reserve_capacity == 0 ?  nullptr : initBufferFrame,
-            frame_reserve_capacity),
-    write_queue_(write_buffer_size,
-            frame_reserve_capacity == 0 ?  nullptr : initBufferFrame,
-            frame_reserve_capacity) {}
+    read_queue_(read_buffer_size),
+    write_queue_(write_buffer_size) {}
 
-Error BufferedConnection::read(Frame* frame) {
+template <typename FrameType>
+Error BufferedConnection<FrameType>::read(FrameType* frame) {
     if (!read_queue_.empty()) {
         *frame = *read_queue_.dequeue();
     } else {
@@ -44,7 +29,8 @@ Error BufferedConnection::read(Frame* frame) {
     return ERR_OK;
 }
 
-Error BufferedConnection::write(const Frame& frame) {
+template <typename FrameType>
+Error BufferedConnection<FrameType>::write(const FrameType& frame) {
     // write buffered frames
     Error err = drainWriteBuffer();
     if (err != ERR_OK) {
@@ -79,12 +65,14 @@ Error BufferedConnection::write(const Frame& frame) {
     return ERR_OK;
 }
 
-void BufferedConnection::flush() {
+template <typename FrameType>
+void BufferedConnection<FrameType>::flush() {
     drainWriteBuffer();
 } 
 
-void BufferedConnection::fillReadBuffer() {
-    Frame* frame;
+template <typename FrameType>
+void BufferedConnection<FrameType>::fillReadBuffer() {
+    FrameType* frame;
     Error err;
     while ((frame = read_queue_.alloc()) != nullptr) {
         err = child_->read(frame);
@@ -100,8 +88,9 @@ void BufferedConnection::fillReadBuffer() {
     }
 }
 
-Error BufferedConnection::drainWriteBuffer() {
-    Frame* frame;
+template <typename FrameType>
+Error BufferedConnection<FrameType>::drainWriteBuffer() {
+    FrameType* frame;
     Error err;
     while ((frame = write_queue_.peek()) != nullptr) {
         err = child_->write(*frame);

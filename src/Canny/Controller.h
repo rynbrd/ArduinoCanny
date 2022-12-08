@@ -65,7 +65,8 @@ enum Bitrate : uint8_t {
 
 // Base class for all CAN controllers. A CAN controller is a physical
 // tranceiver connected to a CAN bus.
-class Controller : public Connection {
+template <typename FrameType>
+class Controller : public Connection<FrameType> {
     public:
         Controller() = default;
         virtual ~Controller() = default;

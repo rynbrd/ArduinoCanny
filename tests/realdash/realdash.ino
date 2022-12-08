@@ -23,8 +23,8 @@ using ::Faker::FakeReadStream;
 using ::Faker::FakeWriteStream;
 
 test(RealDashTest, Read44) {
-    Frame actual;
-    Frame expect(0x5800, 1, {0xf4, 0x08, 0x0e, 0xef, 0x39, 0x2c, 0x1b, 0x4c});
+    CANFDFrame actual;
+    CANFDFrame expect(0x5800, 1, {0xf4, 0x08, 0x0e, 0xef, 0x39, 0x2c, 0x1b, 0x4c});
     byte buffer[] = {
         0x44, 0x33, 0x22, 0x11,
         0x00, 0x58, 0x00, 0x00,
@@ -36,15 +36,15 @@ test(RealDashTest, Read44) {
     FakeReadStream stream;
     stream.set(buffer, sizeof(buffer)/sizeof(buffer[0]));
 
-    RealDash realdash(&stream);
+    RealDash<CANFDFrame> realdash(&stream);
     Error err = realdash.read(&actual);
     assertEqual(err, Error::ERR_OK);
     assertFramesEqual(actual, expect);
 }
 
 test(RealDashTest, Read66Short) {
-    Frame actual;
-    Frame expect(0x5800, 1, {0xf4, 0x08, 0x0e, 0xef, 0x39, 0x2c, 0x1b, 0x4c});
+    CANFDFrame actual;
+    CANFDFrame expect(0x5800, 1, {0xf4, 0x08, 0x0e, 0xef, 0x39, 0x2c, 0x1b, 0x4c});
     byte buffer[] = {
         0x66, 0x33, 0x22, 0x11,
         0x00, 0x58, 0x00, 0x00,
@@ -56,15 +56,15 @@ test(RealDashTest, Read66Short) {
     FakeReadStream stream;
     stream.set(buffer, sizeof(buffer)/sizeof(buffer[0]));
 
-    RealDash realdash(&stream);
+    RealDash<CANFDFrame> realdash(&stream);
     Error err = realdash.read(&actual);
     assertEqual(err, Error::ERR_OK);
     assertFramesEqual(actual, expect);
 }
 
 test(RealDashTest, Read66Long) {
-    Frame actual;
-    Frame expect = Frame(0x5200, 1, {
+    CANFDFrame actual;
+    CANFDFrame expect(0x5200, 1, {
         0xe9, 0x1c, 0xfe, 0x5a, 0xa1, 0x7a, 0x18, 0x4e,
         0xe1, 0x52, 0xff, 0x9a, 0x47, 0xe8, 0x27, 0x11,
         0x4f, 0xf4, 0x46, 0xf1, 0x5f, 0xca, 0xdd, 0x13,
@@ -90,7 +90,7 @@ test(RealDashTest, Read66Long) {
     FakeReadStream stream;
     stream.set(buffer, sizeof(buffer)/sizeof(buffer[0]));
 
-    RealDash realdash(&stream);
+    RealDash<CANFDFrame> realdash(&stream);
     Error err = realdash.read(&actual);
     assertEqual(err, Error::ERR_OK);
     assertFramesEqual(actual, expect);
@@ -98,9 +98,9 @@ test(RealDashTest, Read66Long) {
 
 test(RealDashTest, ReadMulti) {
     Error err;
-    Frame actual1, actual2;
-    Frame expect1(0x5800, 1, {0xf4, 0x08, 0x0e, 0xef, 0x39, 0x2c, 0x1b, 0x4c});
-    Frame expect2(0x5800, 1, {0xf4, 0x08, 0x0e, 0xef, 0x39, 0x2c, 0x1b, 0x4c});
+    CANFDFrame actual1, actual2;
+    CANFDFrame expect1(0x5800, 1, {0xf4, 0x08, 0x0e, 0xef, 0x39, 0x2c, 0x1b, 0x4c});
+    CANFDFrame expect2(0x5800, 1, {0xf4, 0x08, 0x0e, 0xef, 0x39, 0x2c, 0x1b, 0x4c});
 
     byte buffer[] = {
         // 0x44 frame
@@ -120,7 +120,7 @@ test(RealDashTest, ReadMulti) {
     FakeReadStream stream;
     stream.set(buffer, sizeof(buffer)/sizeof(buffer[0]));
 
-    RealDash realdash(&stream);
+    RealDash<CANFDFrame> realdash(&stream);
 
     err = realdash.read(&actual1);
     assertEqual(err, Error::ERR_OK);
@@ -133,8 +133,8 @@ test(RealDashTest, ReadMulti) {
 
 test(RealDashTest, ReadPartial) {
     Error err;
-    Frame actual;
-    Frame expect(0x5800, 1, {0xf4, 0x08, 0x0e, 0xef, 0x39, 0x2c, 0x1b, 0x4c});
+    CANFDFrame actual;
+    CANFDFrame expect(0x5800, 1, {0xf4, 0x08, 0x0e, 0xef, 0x39, 0x2c, 0x1b, 0x4c});
     byte buffer1[] = {
         0x66, 0x33, 0x22, 0x11,
         0x00, 0x58, 0x00, 0x00,
@@ -147,7 +147,7 @@ test(RealDashTest, ReadPartial) {
 
     FakeReadStream stream;
 
-    RealDash realdash(&stream);
+    RealDash<CANFDFrame> realdash(&stream);
 
     stream.set(buffer1, sizeof(buffer1)/sizeof(buffer1[0]));
     err = realdash.read(&actual);
@@ -160,8 +160,8 @@ test(RealDashTest, ReadPartial) {
 }
 
 test(RealDashTest, ReadPreGarbage) {
-    Frame actual;
-    Frame expect(0x5800, 1, {0xf4, 0x08, 0x0e, 0xef, 0x39, 0x2c, 0x1b, 0x4c});
+    CANFDFrame actual;
+    CANFDFrame expect(0x5800, 1, {0xf4, 0x08, 0x0e, 0xef, 0x39, 0x2c, 0x1b, 0x4c});
     byte buffer[] = {
         0xf4, 0x08, 0x0e, 0xef,
         0x66, 0x33, 0x22, 0x11,
@@ -174,7 +174,7 @@ test(RealDashTest, ReadPreGarbage) {
     FakeReadStream stream;
     stream.set(buffer, sizeof(buffer)/sizeof(buffer[0]));
 
-    RealDash realdash(&stream);
+    RealDash<CANFDFrame> realdash(&stream);
     Error err = realdash.read(&actual);
     assertEqual(err, Error::ERR_OK);
     assertFramesEqual(actual, expect);
@@ -182,8 +182,8 @@ test(RealDashTest, ReadPreGarbage) {
 
 test(RealDashTest, ReadPostGarbage) {
     Error err;
-    Frame actual;
-    Frame expect(0x5800, 1, {0xf4, 0x08, 0x0e, 0xef, 0x39, 0x2c, 0x1b, 0x4c});
+    CANFDFrame actual;
+    CANFDFrame expect(0x5800, 1, {0xf4, 0x08, 0x0e, 0xef, 0x39, 0x2c, 0x1b, 0x4c});
     byte buffer[] = {
         0x66, 0x33, 0x22, 0x11,
         0x00, 0x58, 0x00, 0x00,
@@ -196,7 +196,7 @@ test(RealDashTest, ReadPostGarbage) {
     FakeReadStream stream;
     stream.set(buffer, sizeof(buffer)/sizeof(buffer[0]));
 
-    RealDash realdash(&stream);
+    RealDash<CANFDFrame> realdash(&stream);
 
     err = realdash.read(&actual);
     assertEqual(err, Error::ERR_OK);
@@ -207,7 +207,7 @@ test(RealDashTest, ReadPostGarbage) {
 }
 
 test(RealDashTest, Write) {
-    Frame frame(0x5800, 8, {0xf4, 0x08, 0x0e, 0xef, 0x39, 0x2c, 0x1b, 0x4c});
+    CANFDFrame frame(0x5800, 8, {0xf4, 0x08, 0x0e, 0xef, 0x39, 0x2c, 0x1b, 0x4c});
     byte expect[] = {
         0x66, 0x33, 0x22, 0x11,
         0x00, 0x58, 0x00, 0x00,
@@ -222,7 +222,7 @@ test(RealDashTest, Write) {
     FakeWriteStream stream;
     stream.set(actual, size);
 
-    RealDash realdash(&stream);
+    RealDash<CANFDFrame> realdash(&stream);
     Error err = realdash.write(frame);
     assertEqual(err, Error::ERR_OK);
     assertEqual(memcmp(actual, expect, size), 0);

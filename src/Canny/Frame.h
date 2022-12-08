@@ -5,33 +5,38 @@
 
 namespace Canny {
 
+// A CAN frame. CAN frames have an ID, extended frame format flag, and a
+// payload. The payload is represented by a byte array of varying capacity and
+// sizes. Capacity is static for a particular frame implementation, but size
+// may vary from zero to capacity. Capacity of a frame matches the maximum
+// poayload size of the frame on the wire. For CAN 2.0 this is 8 bytes. For
+// CanFD this is 64 bytes. Newly allocated and unused capacity is padded with a
+// given pad byte.
+template <size_t Capacity>
 class Frame : public Printable {
     public:
-        // Construct an empty frame with no capacity. Its data is set to
-        // nullptr and its capacity 0.
+        // Construct an empty frame.
         Frame();
 
-        // Copy constructor. The frame's values and data are copied to the new
-        // frame. This can be an expensive operation on slower boards.
-        Frame(const Frame& frame);
+        // Construct an empty frame with the specified size. The size is
+        // truncated to the frame's capacity and the frame's data is filled
+        // with the pad byte.
+        explicit Frame(uint8_t size, uint8_t pad=0x00);
 
-        // Construct an empty CAN frame with the specified capacity.
-        explicit Frame(uint8_t capacity, uint8_t pad=0x00);
+        // Construct a CAN frame with the provided values and size. The size is
+        // truncated to the frame's capacity and the frame's data is filled
+        // with the pad byte.
+        Frame(uint32_t id, uint8_t ext, uint8_t size, uint8_t pad=0x00);
 
-        // Construct a CAN frame with the provided values and capacity.
-        // Capacity is set to size if no capacity is provided.
-        Frame(uint32_t id, uint8_t ext, uint8_t size,
-                uint8_t capacity=0, uint8_t pad=0x00);
-
-        // Construct a CAN frame with the provided values, data, and capacity.
-        // The size is set to the length of data. Capacity is set to size if no
-        // capacity is provided.
+        // Construct a CAN frame with the provided values and data. Data is
+        // truncated to the frame's capacity and the size is set to the
+        // resulting data length. Any remaining capacity is filled with pad
+        // bytes.
         template <size_t N> 
-        Frame(uint32_t id, uint8_t ext, const uint8_t (&data)[N],
-                uint8_t capacity=0, uint8_t pad=0x00);
+        Frame(uint32_t id, uint8_t ext, const uint8_t (&data)[N], uint8_t pad=0x00);
 
-        // Free's the memory pointed to by data if the frame owns that memory.
-        virtual ~Frame();
+        // Defaults destructor.
+        virtual ~Frame() = default;
 
         // Return the ID of the frame. This is an 11-bit value for standard
         // frames and a 29-bit value for extended frames.
@@ -58,18 +63,19 @@ class Frame : public Printable {
         uint8_t size() const { return size_; }
 
         // Return the capacity of the frame's data buffer.
-        uint8_t capacity() const { return capacity_; }
+        uint8_t capacity() const { return Capacity; }
 
-        // Return a pointer to the frame's data. The data is mutable and is at
-        // least capacity() bytes long. Return nullptr if capacity is 0.
-        uint8_t* data() const { return data_; }
+        // Return a pointer to the frame's data. The data is mutable and is
+        // exactly capacity() bytes long. Never returns a nullptr.
+        uint8_t* data() const { return (uint8_t*)data_; }
 
-        // Set the data from the provided initializer list. The frame is
-        // resized to the length of the list.
+        // Set the data from the provided initializer list. Data is truncated
+        // to Capacity and the frame's size is set to the resulting length.
         template <size_t N> 
         void data(const uint8_t (&data)[N]);
 
-        // Set the data from the provided buffer. The frame is resized to len.
+        // Set the data from the provided buffer. Data is truncated to Capacity
+        // and the frame's size is set to the resulting length.
         void data(const uint8_t* data, uint8_t len);
 
         // Return a mutable pointer to the frame's ID. This is used by
@@ -85,16 +91,12 @@ class Frame : public Printable {
         // The resize() method should be preferred as it is safer.
         uint8_t* mutable_size() { return &size_; }
 
-        // Ensures the frame has at least the requested amount of capacity.
-        // Expands the frame's storage to match capacity if necessary.
-        void reserve(uint8_t capacity);
-
-        // Resize the frame's data. Reserves space to ensure that enough
-        // capacity exists to support the new size. Reducing a frame's size
-        // does not reduce its capacity.
+        // Resize the frame's data. Size is truncated to Capacity. Any
+        // remaining capacity is overwritten with pad bytes.
         void resize(uint8_t size);
 
-        // Clear the frame data. Its bytes are set to the stored pad value.
+        // Clear the frame data. Its bytes are set to the stored pad value. The
+        // size does not change.
         void clear();
 
         // Clear the frame data and upate the pad value. The frame bytes set to
@@ -106,11 +108,11 @@ class Frame : public Printable {
         // Printable.
         size_t printTo(Print& p) const override;
 
-        // Copy the contents of one frame to another. The capacity of the
-        // destination frame is expanded if it is less than the size of the
-        // source frame.
-        Frame& operator=(const Frame& frame);
-
+        // Copy the contents of one frame to another. If the destination frame
+        // does not have the capacity to store the source's data then the data
+        // is truncated to fit.
+        template <size_t OtherCapacity>
+        Frame<Capacity>& operator=(const Frame<OtherCapacity>& frame);
     private:
         // The ID of the frame. This is an 11-bit value for standard frames and
         // a 29-bit value for extended frames.
@@ -119,45 +121,28 @@ class Frame : public Printable {
         uint8_t ext_;
         // The size of the data in the frame.
         uint8_t size_;
-        // The capacity of the frame. This should generally be 8 for CAN 2.0
-        // frames and 64 for CAN FD frames.
-        uint8_t capacity_;
         // The byte to pad extra capacity with.
         uint8_t pad_;
         // The data transmitted with this frame.
-        uint8_t* data_;
-
-        friend bool operator==(const Frame&, const Frame&);
+        uint8_t data_[Capacity];
 };
 
 // Return true if the values of two frames are equal. The id, ext, size, and
 // data are compared directly. Only data[:size] is compared. The capacities of
 // the two frames are ignored.
-bool operator==(const Frame& left, const Frame& right);
+template <size_t LeftCapacity, size_t RightCapacity>
+bool operator==(const Frame<LeftCapacity>& left, const Frame<RightCapacity>& right);
 
 // Return true if the values of two frames are not equal.
 // Equivalent to !(left == right).
-bool operator!=(const Frame& left, const Frame& right);
+template <size_t LeftCapacity, size_t RightCapacity>
+bool operator!=(const Frame<LeftCapacity>& left, const Frame<RightCapacity>& right);
 
-template <size_t N> 
-Frame::Frame(uint32_t id, uint8_t ext, const uint8_t (&data)[N], uint8_t capacity, uint8_t pad) :
-        id_(id), ext_(ext), size_(sizeof(data)),
-        capacity_(max((uint8_t)sizeof(data), capacity)),
-        pad_(pad), data_(new uint8_t[capacity_]) {
-    for (size_t i = 0; i < sizeof(data); i++) {
-        data_[i] = data[i];
-    }
-    memset(data_+size_, pad_, capacity_-size_);
-}
-
-template <size_t N> 
-void Frame::data(const uint8_t (&data)[N]) {
-    resize(sizeof(data));
-    for (size_t i = 0; i < sizeof(data); i++) {
-        data_[i] = data[i];
-    }
-}
+typedef Frame<8> CAN20Frame;
+typedef Frame<64> CANFDFrame;
 
 }  // namespace Canny
+
+#include "Frame.tpp"
 
 #endif  // _CANNY_FRAME_H_

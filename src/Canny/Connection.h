@@ -11,6 +11,7 @@ namespace Canny {
 // and receiving CAN frames. A connection does not necessarily represent a
 // connection to a physical CAN bus but may instead be used to communicate
 // frames with other devices.
+template <typename FrameType>
 class Connection {
     public:
         Connection() = default;
@@ -27,7 +28,7 @@ class Connection {
         // Return ERR_OK if data is read into the provided frame. Return
         // ERR_FIFO if no frame is available to be read. See the Error
         // definition for the meaning of other error codes.
-        virtual Error read(Frame* frame) = 0;
+        virtual Error read(FrameType* frame) = 0;
 
         // Write a frame without blocking.
         //
@@ -38,7 +39,7 @@ class Connection {
         // controllers may not transmit buffers larger than 8 bytes. CAN FD
         // controllers are limited to 64 bytes. See the Error definition for
         // the meaning of other error codes.
-        virtual Error write(const Frame& frame) = 0;
+        virtual Error write(const FrameType& frame) = 0;
 };
 
 }  // namespace Canny

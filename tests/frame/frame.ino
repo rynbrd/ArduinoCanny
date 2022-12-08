@@ -1,47 +1,35 @@
 #include <Arduino.h>
 #include <AUnit.h>
-#include <Canny/Frame.h>
+#include <Canny.h>
 
 using namespace aunit;
-using ::Canny::Frame;
+
+namespace Canny {
 
 test(ConstructorTest, Default) {
-    Frame f;
+    Frame<8> f;
     
     assertEqual(f.id(), 0u);
     assertEqual(f.ext(), 0);
     assertEqual(f.size(), 0);
-    assertEqual(f.capacity(), 0);
-    assertEqual(f.data(), nullptr);
-}
-
-test(ConstructorTest, Capacity) {
-    Frame f(12); 
-    uint8_t expect_data[12];
-    memset(expect_data, 0, 12);
-
-    assertEqual(f.id(), 0u);
-    assertEqual(f.ext(), 0);
-    assertEqual(f.size(), 0);
-    assertEqual(f.capacity(), 12);
-    assertEqual(memcmp(f.data(), expect_data, 12), 0);
+    assertEqual(f.capacity(), 8);
+    assertNotEqual(f.data(), nullptr);
 }
 
 test(ConstructorTest, SetAllDefaults) {
-    Frame f(0x321, 1, 8);
+    Frame<8> f(0x321, 1, 0);
     uint8_t expect_data[8];
     memset(expect_data, 0, 8);
 
     assertEqual(f.id(), 0x321u);
     assertEqual(f.ext(), 1);
-    assertEqual(f.size(), 8);
+    assertEqual(f.size(), 0);
     assertEqual(f.capacity(), 8);
     assertEqual(memcmp(f.data(), expect_data, 8), 0);
 }
 
-test(ConstructorTest, SetAllSetCapacity) {
-    Frame f(0x432, 0, 8, 12);
-    memset(f.data(), 0xF2, 12);
+test(ConstructorTest, SetAllPad) {
+    Frame<12> f(0x432, 0, 8, 0xF2);
     uint8_t expect_data[12];
     memset(expect_data, 0xF2, 12);
 
@@ -53,9 +41,9 @@ test(ConstructorTest, SetAllSetCapacity) {
 }
 
 test(ConstructorTest, Copy) {
-    Frame f1(0x123, 0, 8);
+    Frame<8> f1(0x123, 0, 8);
     memset(f1.data(), 0xF1, 8);
-    Frame f2(f1);
+    Frame<8> f2(f1);
 
     assertEqual(f2.id(), 0x123u);
     assertEqual(f2.ext(), 0);
@@ -65,32 +53,19 @@ test(ConstructorTest, Copy) {
     assertNotEqual(f1.data(), f2.data());
 }
 
-#ifdef EPOXY_DUINO
 test(ConstructorTest, InitializerListDefault) {
-    Frame f(0x123, 0, {0x1A, 0x2B, 0x4C, 0x5D});
+    Frame<8> f(0x123, 0, {0x1A, 0x2B, 0x4C, 0x5D});
     uint8_t expect_data[4] = {0x1A, 0x2B, 0x4C, 0x5D};
 
     assertEqual(f.id(), 0x123u);
     assertEqual(f.ext(), 0);
     assertEqual(f.size(), 4);
-    assertEqual(f.capacity(), 4);
+    assertEqual(f.capacity(), 8);
     assertEqual(memcmp(f.data(), expect_data, 4), 0);
 }
 
-test(ConstructorTest, InitializerListExtraCapacity) {
-    Frame f(0x123, 0, {0x1A, 0x2B, 0x4C, 0x5D}, 8);
-    memset(f.data()+4, 0xFF, 4);
-    uint8_t expect_data[8] = {0x1A, 0x2B, 0x4C, 0x5D, 0xFF, 0xFF, 0xFF, 0xFF};
-
-    assertEqual(f.id(), 0x123u);
-    assertEqual(f.ext(), 0);
-    assertEqual(f.size(), 4);
-    assertEqual(f.capacity(), 8);
-    assertEqual(memcmp(f.data(), expect_data, 8), 0);
-}
-
 test(DataTest, LessSize) {
-    Frame f(0x123, 0, {0x1A, 0x2B, 0x4C, 0x5D, 0x6E, 0x7F, 0x80, 0x91});
+    Frame<8> f(0x123, 0, {0x1A, 0x2B, 0x4C, 0x5D, 0x6E, 0x7F, 0x80, 0x91});
     uint8_t expect_data[8] = {0x5D, 0x6E, 0x80, 0x91};
     f.data({0x5D, 0x6E, 0x80, 0x91});
 
@@ -102,7 +77,7 @@ test(DataTest, LessSize) {
 }
 
 test(DataTest, SameSize) {
-    Frame f(0x123, 0, {0x1A, 0x2B, 0x4C, 0x5D});
+    Frame<4> f(0x123, 0, {0x1A, 0x2B, 0x4C, 0x5D});
     uint8_t expect_data[4] = {0x5D, 0x6E, 0x80, 0x91};
     f.data({0x5D, 0x6E, 0x80, 0x91});
 
@@ -113,57 +88,8 @@ test(DataTest, SameSize) {
     assertEqual(memcmp(f.data(), expect_data, 4), 0);
 }
 
-test(DataTest, MoreSize) {
-    Frame f(0x123, 0, {0x1A, 0x2B, 0x4C, 0x5D});
-    uint8_t expect_data[8] = {0x1A, 0x2B, 0x4C, 0x5D, 0x6E, 0x7F, 0x80, 0x91};
-    f.data({0x1A, 0x2B, 0x4C, 0x5D, 0x6E, 0x7F, 0x80, 0x91});
-
-    assertEqual(f.id(), 0x123u);
-    assertEqual(f.ext(), 0);
-    assertEqual(f.size(), 8);
-    assertEqual(f.capacity(), 8);
-    assertEqual(memcmp(f.data(), expect_data, 8), 0);
-}
-#endif
-
-test(ReserveTest, LessCapacity) {
-    Frame f(0x123, 0, {0x1A, 0x2B, 0x4C, 0x5D, 0x6E, 0x7F, 0x80, 0x91});
-    uint8_t expect_data[8] = {0x1A, 0x2B, 0x4C, 0x5D, 0x6E, 0x7F, 0x80, 0x91};
-    f.reserve(4);
-
-    assertEqual(f.id(), 0x123u);
-    assertEqual(f.ext(), 0);
-    assertEqual(f.size(), 8);
-    assertEqual(f.capacity(), 8);
-    assertEqual(memcmp(f.data(), expect_data, 8), 0);
-}
-
-test(ReserveTest, SameCapacity) {
-    Frame f(0x123, 0, {0x1A, 0x2B, 0x4C, 0x5D, 0x6E, 0x7F, 0x80, 0x91});
-    uint8_t expect_data[8] = {0x1A, 0x2B, 0x4C, 0x5D, 0x6E, 0x7F, 0x80, 0x91};
-    f.reserve(8);
-
-    assertEqual(f.id(), 0x123u);
-    assertEqual(f.ext(), 0);
-    assertEqual(f.size(), 8);
-    assertEqual(f.capacity(), 8);
-    assertEqual(memcmp(f.data(), expect_data, 8), 0);
-}
-
-test(ReserveTest, MoreCapacity) {
-    Frame f(0x123, 0, {0x1A, 0x2B, 0x4C, 0x5D, 0x6E, 0x7F, 0x80, 0x91});
-    uint8_t expect_data[8] = {0x1A, 0x2B, 0x4C, 0x5D, 0x6E, 0x7F, 0x80, 0x91};
-    f.reserve(10);
-
-    assertEqual(f.id(), 0x123u);
-    assertEqual(f.ext(), 0);
-    assertEqual(f.size(), 8);
-    assertEqual(f.capacity(), 10);
-    assertEqual(memcmp(f.data(), expect_data, 8), 0);
-}
-
 test(ResizeTest, LessSize) {
-    Frame f(0x123, 0, {0x1A, 0x2B, 0x4C, 0x5D});
+    Frame<4> f(0x123, 0, {0x1A, 0x2B, 0x4C, 0x5D});
     uint8_t expect_data[4] = {0x1A, 0x2B, 0x00, 0x00};
     f.resize(2);
 
@@ -175,7 +101,7 @@ test(ResizeTest, LessSize) {
 }
 
 test(ResizeTest, MoreSizeWithinCapacity) {
-    Frame f(0x123, 0, {0x1A, 0x2B, 0x4C, 0x5D}, 8);
+    Frame<8> f(0x123, 0, {0x1A, 0x2B, 0x4C, 0x5D});
     uint8_t expect_data[8] = {0x1A, 0x2B, 0x4C, 0x5D, 0x00, 0x00, 0x00, 0x00};
     f.resize(6);
 
@@ -187,22 +113,22 @@ test(ResizeTest, MoreSizeWithinCapacity) {
 }
 
 test(ResizeTest, MoreSizeExceedsCapacity) {
-    Frame f(0x123, 0, {0x1A, 0x2B, 0x4C, 0x5D});
-    uint8_t expect_data[6] = {0x1A, 0x2B, 0x4C, 0x5D, 0x00, 0x00};
+    Frame<4> f(0x123, 0, {0x1A, 0x2B, 0x4C, 0x5D});
+    uint8_t expect_data[4] = {0x1A, 0x2B, 0x4C, 0x5D};
     f.resize(6);
 
     assertEqual(f.id(), 0x123u);
     assertEqual(f.ext(), 0);
-    assertEqual(f.size(), 6);
-    assertEqual(f.capacity(), 6);
-    assertEqual(memcmp(f.data(), expect_data, 6), 0);
+    assertEqual(f.size(), 4);
+    assertEqual(f.capacity(), 4);
+    assertEqual(memcmp(f.data(), expect_data, 4), 0);
 }
 
-test(ClearTest, SetFill) {
+test(ClearTest, SetPad) {
     uint8_t expect_data[64];
     memset(expect_data, 0xAA, 64);
 
-    Frame f(0x12, 0, 32, 64);
+    Frame<64> f(0x12, 0, 32);
     f.clear(0xAA);
 
     assertEqual(f.id(), 0x12u);
@@ -213,8 +139,8 @@ test(ClearTest, SetFill) {
 }
 
 test(SetTest, SmallerFrame) {
-    Frame f1(0x123, 0, {0x1A, 0x2B, 0x4C, 0x5D});
-    Frame f2(0x321, 1, {0xF1, 0xE2});
+    Frame<4> f1(0x123, 0, {0x1A, 0x2B, 0x4C, 0x5D});
+    Frame<2> f2(0x321, 1, {0xF1, 0xE2});
     uint8_t expect_data[2] = {0xF1, 0xE2};
     f1 = f2;
 
@@ -226,56 +152,56 @@ test(SetTest, SmallerFrame) {
 }
 
 test(SetTest, LargerFrame) {
-    Frame f1(0x321, 1, {0xF1, 0xE2});
-    Frame f2(0x123, 0, {0x1A, 0x2B, 0x4C, 0x5D});
-    uint8_t expect_data[4] = {0x1A, 0x2B, 0x4C, 0x5D};
+    Frame<2> f1(0x321, 1, {0xF1, 0xE2});
+    Frame<4> f2(0x123, 0, {0x1A, 0x2B, 0x4C, 0x5D});
+    uint8_t expect_data[4] = {0x1A, 0x2B};
     f1 = f2;
 
     assertEqual(f1.id(), 0x123u);
     assertEqual(f1.ext(), 0);
-    assertEqual(f1.size(), 4);
-    assertEqual(f1.capacity(), 4);
-    assertEqual(memcmp(f1.data(), expect_data, 4), 0);
+    assertEqual(f1.size(), 2);
+    assertEqual(f1.capacity(), 2);
+    assertEqual(memcmp(f1.data(), expect_data, 2), 0);
 }
 
 test(EqualsTest, SameFrame) {
-    Frame f(0x01, 0, 8);
+    Frame<8> f(0x01, 0, 8);
     assertTrue(f == f);
 }
 
 test(EqualsTest, DifferentID) {
-    Frame f1(0x01, 0, 8);
-    Frame f2(0x02, 0, 8);
+    Frame<8> f1(0x01, 0, 8);
+    Frame<8> f2(0x02, 0, 8);
     assertTrue(f1 != f2);
 }
 
 test(EqualsTest, DifferentExt) {
-    Frame f1(0x01, 0, 8);
-    Frame f2(0x01, 1, 8);
+    Frame<8> f1(0x01, 0, 8);
+    Frame<8> f2(0x01, 1, 8);
     assertTrue(f1 != f2);
 }
 
 test(EqualsTest, DifferentData) {
-    Frame f1(0x01, 0, 8, 8);
-    Frame f2(0x01, 0, 8, 8);
+    Frame<8> f1(0x01, 0, 8);
+    Frame<8> f2(0x01, 0, 8);
     memset(f2.data(), 0xFF, 8);
     assertTrue(f1 != f2);
 }
 
 test(EqualsTest, DifferentSize) {
-    Frame f1(0x01, 0, 8, 64);
-    Frame f2(0x01, 0, 16, 64);
+    Frame<64> f1(0x01, 0, 8);
+    Frame<64> f2(0x01, 0, 16);
     assertTrue(f1 != f2);
 }
 
 test(EqualsTest, DifferentCapacity) {
-    Frame f1(0x01, 0, 8, 8);
-    Frame f2(0x01, 0, 8, 64);
+    Frame<8> f1(0x01, 0, 8);
+    Frame<64> f2(0x01, 0, 8);
     assertTrue(f1 == f2);
 }
 
 test(MutableTest, MutableID) {
-    Frame f(0x123, 0, {0x1A, 0x2B, 0x4C, 0x5D});
+    Frame<4> f(0x123, 0, {0x1A, 0x2B, 0x4C, 0x5D});
     uint8_t expect_data[4] = {0x1A, 0x2B, 0x4C, 0x5D};
 
     *f.mutable_id() = 0x01;
@@ -287,7 +213,7 @@ test(MutableTest, MutableID) {
 }
 
 test(MutableTest, MutableExt) {
-    Frame f(0x123, 0, {0x1A, 0x2B, 0x4C, 0x5D});
+    Frame<4> f(0x123, 0, {0x1A, 0x2B, 0x4C, 0x5D});
     uint8_t expect_data[4] = {0x1A, 0x2B, 0x4C, 0x5D};
 
     *f.mutable_ext() = 1;
@@ -299,7 +225,7 @@ test(MutableTest, MutableExt) {
 }
 
 test(MutableTest, MutableSize) {
-    Frame f(0x123, 0, {0x1A, 0x2B, 0x4C, 0x5D});
+    Frame<4> f(0x123, 0, {0x1A, 0x2B, 0x4C, 0x5D});
     uint8_t expect_data[4] = {0x1A, 0x2B, 0x4C, 0x5D};
 
     *f.mutable_size() = 2;
@@ -311,7 +237,7 @@ test(MutableTest, MutableSize) {
 }
 
 test(MutableTest, MutableData) {
-    Frame f(0x123, 0, 4);
+    Frame<4> f(0x123, 0, 4);
     uint8_t expect_data[4] = {0x1A, 0x2B, 0x4C, 0x5D};
     memcpy(f.data(), expect_data, 4);
 
@@ -321,6 +247,8 @@ test(MutableTest, MutableData) {
     assertEqual(f.capacity(), 4);
     assertEqual(memcmp(f.data(), expect_data, 4), 0);
 }
+
+}  // namespace Canny
 
 // Test boilerplate.
 void setup() {

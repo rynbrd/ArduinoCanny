@@ -46,7 +46,7 @@ bool j1939_name_arbitrary_address(uint64_t name);
 
 // A J1939 message. All J1939 messages are CAN frames with an extended ID space
 // and an 8-byte payload.
-class J1939Message : public Frame {
+class J1939Message : public Frame<8> {
     public:
         // Construct an empty message with no capacity. Its data is set to
         // nullptr and its capacity to 0. Priority defaults to 111b, PGN to

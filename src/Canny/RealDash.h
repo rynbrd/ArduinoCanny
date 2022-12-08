@@ -4,12 +4,14 @@
 #include <Arduino.h>
 #include <CRC32.h>
 #include "Connection.h"
+#include "Frame.h"
 
 namespace Canny {
 
 // Reads and writes frames to RealDash over serial. Supports reading RealDash
 // 0x44 and 0x66 type frames. All written frames are 0x66 for simplicity.
-class RealDash : public Connection {
+template <typename FrameType>
+class RealDash : public Connection<FrameType> {
     public:
         // Construct a RealDash instance that communicates over the given
         // stream. This is typically Serial or SerialUSB.
@@ -21,14 +23,14 @@ class RealDash : public Connection {
         //
         // The ext flag is always set to 1. RealDash encodes all frame IDs as 4
         // bytes and does not provide an ext flag.
-        Error read(Frame* frame) override;
+        Error read(FrameType* frame) override;
 
         // Write a frame to the RealDash stream. Return ERR_OK on success.
-        virtual Error write(const Frame& frame) override;
+        virtual Error write(const FrameType& frame) override;
 
     private:
         Stream* stream_;
-        Canny::Frame frame_;
+        FrameType frame_;
 
         // Read attributes.
         bool frame_type_66_;        // Type of frame. False if 0x44, true if 0x66.
@@ -52,5 +54,7 @@ class RealDash : public Connection {
 };
 
 }  // namespace Canny
+
+#include "RealDash.tpp"
 
 #endif  // _CANNY_REALDASH_H_

@@ -23,18 +23,24 @@ class FrameIDFilter {
 
         // Allow a frame.
         void allow(uint32_t frame_id);
-        void allow(const Frame& frame) { allow(frame.id()); }
+        void allow(const int frame_id) { allow((uint32_t)frame_id); };
+        template <typename FrameType>
+        void allow(const FrameType& frame) { allow(frame.id()); }
 
         // Drop a frame.
         void drop(uint32_t frame_id);
-        void drop(const Frame& frame) { drop(frame.id()); }
+        void drop(const int frame_id) { drop((uint32_t)frame_id); };
+        template <typename FrameType>
+        void drop(const FrameType& frame) { drop(frame.id()); }
 
         // Clear the filter.
         void clear();
 
         // Return true if a frame is allowed through the filter.
         bool match(uint32_t frame_id);
-        bool match(const Frame& frame) { return match(frame.id()); }
+        bool match(const int frame_id) { return match((uint32_t)frame_id); };
+        template <typename FrameType>
+        bool match(const FrameType& frame) { return match(frame.id()); }
 
     private:
         // Add a frame ID to filter items.
