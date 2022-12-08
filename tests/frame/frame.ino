@@ -12,7 +12,7 @@ test(ConstructorTest, Default) {
     assertEqual(f.id(), 0u);
     assertEqual(f.ext(), 0);
     assertEqual(f.size(), 0);
-    assertEqual(f.capacity(), 8);
+    assertEqual((int)f.capacity, 8);
     assertNotEqual(f.data(), nullptr);
 }
 
@@ -24,7 +24,7 @@ test(ConstructorTest, SetAllDefaults) {
     assertEqual(f.id(), 0x321u);
     assertEqual(f.ext(), 1);
     assertEqual(f.size(), 0);
-    assertEqual(f.capacity(), 8);
+    assertEqual((int)f.capacity, 8);
     assertEqual(memcmp(f.data(), expect_data, 8), 0);
 }
 
@@ -36,7 +36,7 @@ test(ConstructorTest, SetAllPad) {
     assertEqual(f.id(), 0x432u);
     assertEqual(f.ext(), 0);
     assertEqual(f.size(), 8);
-    assertEqual(f.capacity(), 12);
+    assertEqual((int)f.capacity, 12);
     assertEqual(memcmp(f.data(), expect_data, 12), 0);
 }
 
@@ -48,7 +48,7 @@ test(ConstructorTest, Copy) {
     assertEqual(f2.id(), 0x123u);
     assertEqual(f2.ext(), 0);
     assertEqual(f2.size(), 8);
-    assertEqual(f2.capacity(), 8);
+    assertEqual((int)f2.capacity, 8);
     assertEqual(memcmp(f2.data(), f1.data(), 8), 0);
     assertNotEqual(f1.data(), f2.data());
 }
@@ -60,7 +60,7 @@ test(ConstructorTest, InitializerListDefault) {
     assertEqual(f.id(), 0x123u);
     assertEqual(f.ext(), 0);
     assertEqual(f.size(), 4);
-    assertEqual(f.capacity(), 8);
+    assertEqual((int)f.capacity, 8);
     assertEqual(memcmp(f.data(), expect_data, 4), 0);
 }
 
@@ -72,7 +72,7 @@ test(DataTest, LessSize) {
     assertEqual(f.id(), 0x123u);
     assertEqual(f.ext(), 0);
     assertEqual(f.size(), 4);
-    assertEqual(f.capacity(), 8);
+    assertEqual((int)f.capacity, 8);
     assertEqual(memcmp(f.data(), expect_data, 4), 0);
 }
 
@@ -84,7 +84,7 @@ test(DataTest, SameSize) {
     assertEqual(f.id(), 0x123u);
     assertEqual(f.ext(), 0);
     assertEqual(f.size(), 4);
-    assertEqual(f.capacity(), 4);
+    assertEqual((int)f.capacity, 4);
     assertEqual(memcmp(f.data(), expect_data, 4), 0);
 }
 
@@ -96,7 +96,7 @@ test(ResizeTest, LessSize) {
     assertEqual(f.id(), 0x123u);
     assertEqual(f.ext(), 0);
     assertEqual(f.size(), 2);
-    assertEqual(f.capacity(), 4);
+    assertEqual((int)f.capacity, 4);
     assertEqual(memcmp(f.data(), expect_data, 4), 0);
 }
 
@@ -108,7 +108,7 @@ test(ResizeTest, MoreSizeWithinCapacity) {
     assertEqual(f.id(), 0x123u);
     assertEqual(f.ext(), 0);
     assertEqual(f.size(), 6);
-    assertEqual(f.capacity(), 8);
+    assertEqual((int)f.capacity, 8);
     assertEqual(memcmp(f.data(), expect_data, 8), 0);
 }
 
@@ -120,7 +120,7 @@ test(ResizeTest, MoreSizeExceedsCapacity) {
     assertEqual(f.id(), 0x123u);
     assertEqual(f.ext(), 0);
     assertEqual(f.size(), 4);
-    assertEqual(f.capacity(), 4);
+    assertEqual((int)f.capacity, 4);
     assertEqual(memcmp(f.data(), expect_data, 4), 0);
 }
 
@@ -134,7 +134,7 @@ test(ClearTest, SetPad) {
     assertEqual(f.id(), 0x12u);
     assertEqual(f.ext(), 0);
     assertEqual(f.size(), 32);
-    assertEqual(f.capacity(), 64);
+    assertEqual((int)f.capacity, 64);
     assertEqual(memcmp(f.data(), expect_data, 64), 0);
 }
 
@@ -147,7 +147,7 @@ test(SetTest, SmallerFrame) {
     assertEqual(f1.id(), 0x321u);
     assertEqual(f1.ext(), 1);
     assertEqual(f1.size(), 2);
-    assertEqual(f1.capacity(), 4);
+    assertEqual((int)f1.capacity, 4);
     assertEqual(memcmp(f1.data(), expect_data, 2), 0);
 }
 
@@ -160,7 +160,7 @@ test(SetTest, LargerFrame) {
     assertEqual(f1.id(), 0x123u);
     assertEqual(f1.ext(), 0);
     assertEqual(f1.size(), 2);
-    assertEqual(f1.capacity(), 2);
+    assertEqual((int)f1.capacity, 2);
     assertEqual(memcmp(f1.data(), expect_data, 2), 0);
 }
 
@@ -208,7 +208,7 @@ test(MutableTest, MutableID) {
     assertEqual(f.id(), 0x01u);
     assertEqual(f.ext(), 0);
     assertEqual(f.size(), 4);
-    assertEqual(f.capacity(), 4);
+    assertEqual((int)f.capacity, 4);
     assertEqual(memcmp(f.data(), expect_data, 4), 0);
 }
 
@@ -220,7 +220,7 @@ test(MutableTest, MutableExt) {
     assertEqual(f.id(), 0x123u);
     assertEqual(f.ext(), 1);
     assertEqual(f.size(), 4);
-    assertEqual(f.capacity(), 4);
+    assertEqual((int)f.capacity, 4);
     assertEqual(memcmp(f.data(), expect_data, 4), 0);
 }
 
@@ -232,7 +232,7 @@ test(MutableTest, MutableSize) {
     assertEqual(f.id(), 0x123u);
     assertEqual(f.ext(), 0);
     assertEqual(f.size(), 2);
-    assertEqual(f.capacity(), 4);
+    assertEqual((int)f.capacity, 4);
     assertEqual(memcmp(f.data(), expect_data, 4), 0);
 }
 
@@ -244,7 +244,7 @@ test(MutableTest, MutableData) {
     assertEqual(f.id(), 0x123u);
     assertEqual(f.ext(), 0);
     assertEqual(f.size(), 4);
-    assertEqual(f.capacity(), 4);
+    assertEqual((int)f.capacity, 4);
     assertEqual(memcmp(f.data(), expect_data, 4), 0);
 }
 

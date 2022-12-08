@@ -15,6 +15,8 @@ namespace Canny {
 template <size_t Capacity>
 class Frame : public Printable {
     public:
+        static constexpr size_t capacity = Capacity;
+
         // Construct an empty frame.
         Frame();
 
@@ -61,9 +63,6 @@ class Frame : public Printable {
 
         // Return the length of the frame's data in bytes.
         uint8_t size() const { return size_; }
-
-        // Return the capacity of the frame's data buffer.
-        uint8_t capacity() const { return Capacity; }
 
         // Return a pointer to the frame's data. The data is mutable and is
         // exactly capacity() bytes long. Never returns a nullptr.
