@@ -126,13 +126,13 @@ class Frame : public Printable {
 // Return true if the values of two frames are equal. The id, ext, size, and
 // data are compared directly. Only data[:size] is compared. The capacities of
 // the two frames are ignored.
-template <size_t LeftCapacity, size_t RightCapacity>
-bool operator==(const Frame<LeftCapacity>& left, const Frame<RightCapacity>& right);
+template <size_t LeftCapacity, uint8_t LeftPad, size_t RightCapacity, uint8_t RightPad>
+bool operator==(const Frame<LeftCapacity, LeftPad>& left, const Frame<RightCapacity, RightPad>& right);
 
 // Return true if the values of two frames are not equal.
 // Equivalent to !(left == right).
-template <size_t LeftCapacity, size_t RightCapacity>
-bool operator!=(const Frame<LeftCapacity>& left, const Frame<RightCapacity>& right);
+template <size_t LeftCapacity, uint8_t LeftPad, size_t RightCapacity, uint8_t RightPad>
+bool operator!=(const Frame<LeftCapacity, LeftPad>& left, const Frame<RightCapacity, RightPad>& right);
 
 typedef Frame<8, 0x00> CAN20Frame;
 typedef Frame<64, 0x00> CANFDFrame;

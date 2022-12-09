@@ -102,8 +102,8 @@ Frame<Capacity, Pad>& Frame<Capacity, Pad>::operator=(const Frame<OtherCapacity,
     return *this;
 }
 
-template <size_t LeftCapacity, size_t RightCapacity>
-bool operator==(const Frame<LeftCapacity>& left, const Frame<RightCapacity>& right) {
+template <size_t LeftCapacity, uint8_t LeftPad, size_t RightCapacity, uint8_t RightPad>
+bool operator==(const Frame<LeftCapacity, LeftPad>& left, const Frame<RightCapacity, RightPad>& right) {
     if (left.id() != right.id() || left.size() != right.size() || left.ext() != right.ext()) {
         return false;
     }
@@ -113,8 +113,8 @@ bool operator==(const Frame<LeftCapacity>& left, const Frame<RightCapacity>& rig
     return memcmp(left.data(), right.data(), left.size()) == 0;
 }
 
-template <size_t LeftCapacity, size_t RightCapacity>
-bool operator!=(const Frame<LeftCapacity>& left, const Frame<RightCapacity>& right) {
+template <size_t LeftCapacity, uint8_t LeftPad, size_t RightCapacity, uint8_t RightPad>
+bool operator!=(const Frame<LeftCapacity, LeftPad>& left, const Frame<RightCapacity, RightPad>& right) {
     return !(left == right);
 }
 
