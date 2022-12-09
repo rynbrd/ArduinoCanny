@@ -54,10 +54,10 @@ bool j1939_name_arbitrary_address(uint64_t name) {
     return name & 0x00000000000000001;
 }
 
-J1939Message::J1939Message() : Frame<8>(0x1C0000FF, 1, 0, 0xFF) {}
+J1939Message::J1939Message() : Frame<8, 0xFF>(0x1C0000FF, 1, 0) {}
 
 J1939Message::J1939Message(uint32_t pgn, uint8_t sa, uint8_t da, uint8_t priority) :
-    Frame<8>(((priority & 0x07) << 26) | (pgn << 8) | sa | (PDU1(pgn) ? da << 8 : 0x00), 1, 0, 0xFF) {}
+    Frame<8, 0xFF>(((priority & 0x07) << 26) | (pgn << 8) | sa | (PDU1(pgn) ? da << 8 : 0x00), 1, 0) {}
 
 void J1939Message::name(uint64_t name) {
     resize(8);

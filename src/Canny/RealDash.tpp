@@ -3,7 +3,7 @@ namespace Canny {
 static const uint32_t kReceiveTimeout = 5000;
 
 template <typename FrameType>
-RealDash<FrameType>::RealDash(Stream* stream) : stream_(stream), frame_(0, 1, 0, 8) {
+RealDash<FrameType>::RealDash(Stream* stream) : stream_(stream), frame_(0, 1, 0) {
     reset();
 }
 

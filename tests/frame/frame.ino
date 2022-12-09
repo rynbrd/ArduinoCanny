@@ -29,7 +29,7 @@ test(ConstructorTest, SetAllDefaults) {
 }
 
 test(ConstructorTest, SetAllPad) {
-    Frame<12> f(0x432, 0, 8, 0xF2);
+    Frame<12, 0xF2> f(0x432, 0, 8);
     uint8_t expect_data[12];
     memset(expect_data, 0xF2, 12);
 
@@ -122,20 +122,6 @@ test(ResizeTest, MoreSizeExceedsCapacity) {
     assertEqual(f.size(), 4);
     assertEqual((int)f.capacity, 4);
     assertEqual(memcmp(f.data(), expect_data, 4), 0);
-}
-
-test(ClearTest, SetPad) {
-    uint8_t expect_data[64];
-    memset(expect_data, 0xAA, 64);
-
-    Frame<64> f(0x12, 0, 32);
-    f.clear(0xAA);
-
-    assertEqual(f.id(), 0x12u);
-    assertEqual(f.ext(), 0);
-    assertEqual(f.size(), 32);
-    assertEqual((int)f.capacity, 64);
-    assertEqual(memcmp(f.data(), expect_data, 64), 0);
 }
 
 test(SetTest, SmallerFrame) {

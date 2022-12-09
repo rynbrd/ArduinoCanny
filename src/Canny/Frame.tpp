@@ -1,40 +1,40 @@
 namespace Canny {
 
-template <size_t Capacity>
-Frame<Capacity>::Frame() : id_(0), ext_(0), size_(0), pad_(0x00) {
+template <size_t Capacity, uint8_t Pad>
+Frame<Capacity, Pad>::Frame() : id_(0), ext_(0), size_(0) {
     memset(data_, pad_, Capacity);
 }
 
-template <size_t Capacity>
-Frame<Capacity>::Frame(uint8_t size, uint8_t pad) :
-        id_(0), ext_(0), size_(size), pad_(pad) {
+template <size_t Capacity, uint8_t Pad>
+Frame<Capacity, Pad>::Frame(uint8_t size) :
+        id_(0), ext_(0), size_(size) {
     memset(data_, pad_, Capacity);
 }
 
-template <size_t Capacity>
-Frame<Capacity>::Frame(uint32_t id, uint8_t ext, uint8_t size, uint8_t pad) :
-        id_(id), ext_(ext), size_(size), pad_(pad) {
+template <size_t Capacity, uint8_t Pad>
+Frame<Capacity, Pad>::Frame(uint32_t id, uint8_t ext, uint8_t size) :
+        id_(id), ext_(ext), size_(size) {
     memset(data_, pad_, Capacity);
 }
 
-template <size_t Capacity>
+template <size_t Capacity, uint8_t Pad>
 template <size_t N> 
-Frame<Capacity>::Frame(uint32_t id, uint8_t ext, const uint8_t (&data)[N], uint8_t pad) :
-        id_(id), ext_(ext), size_(min(Capacity, N)), pad_(pad) {
+Frame<Capacity, Pad>::Frame(uint32_t id, uint8_t ext, const uint8_t (&data)[N]) :
+        id_(id), ext_(ext), size_(min(Capacity, N)) {
     for (size_t i = 0; i < size_; i++) {
         data_[i] = data[i];
     }
     memset(data_+size_, pad_, Capacity-size_);
 }
 
-template <size_t Capacity>
-void Frame<Capacity>::id(uint32_t id, uint8_t ext) {
+template <size_t Capacity, uint8_t Pad>
+void Frame<Capacity, Pad>::id(uint32_t id, uint8_t ext) {
     id_ = id;
     ext_ = (ext == 1) ? 1 : 0;
 }
 
-template <size_t Capacity>
-void Frame<Capacity>::data(const uint8_t* data, uint8_t len) {
+template <size_t Capacity, uint8_t Pad>
+void Frame<Capacity, Pad>::data(const uint8_t* data, uint8_t len) {
     if (len > Capacity) {
         len = Capacity;
     }
@@ -42,17 +42,17 @@ void Frame<Capacity>::data(const uint8_t* data, uint8_t len) {
     memcpy(data_, data, len);
 }
 
-template <size_t Capacity>
+template <size_t Capacity, uint8_t Pad>
 template <size_t N> 
-void Frame<Capacity>::data(const uint8_t (&data)[N]) {
+void Frame<Capacity, Pad>::data(const uint8_t (&data)[N]) {
     resize(sizeof(data));
     for (size_t i = 0; i < sizeof(data); i++) {
         data_[i] = data[i];
     }
 }
 
-template <size_t Capacity>
-void Frame<Capacity>::resize(uint8_t size) {
+template <size_t Capacity, uint8_t Pad>
+void Frame<Capacity, Pad>::resize(uint8_t size) {
     if (size > Capacity) {
         size = Capacity;
     } else if (size < Capacity) {
@@ -61,19 +61,13 @@ void Frame<Capacity>::resize(uint8_t size) {
     size_ = size;
 }
 
-template <size_t Capacity>
-void Frame<Capacity>::clear() {
+template <size_t Capacity, uint8_t Pad>
+void Frame<Capacity, Pad>::clear() {
     memset(data_, pad_, Capacity);
 }
 
-template <size_t Capacity>
-void Frame<Capacity>::clear(uint8_t pad) {
-    pad_ = pad;
-    clear();
-}
-
-template <size_t Capacity>
-size_t Frame<Capacity>::printTo(Print& p) const {
+template <size_t Capacity, uint8_t Pad>
+size_t Frame<Capacity, Pad>::printTo(Print& p) const {
     size_t n = 0;
     if (ext()) {
         n += p.print("+");
@@ -94,9 +88,9 @@ size_t Frame<Capacity>::printTo(Print& p) const {
     return n;
 }
 
-template <size_t Capacity>
-template <size_t OtherCapacity>
-Frame<Capacity>& Frame<Capacity>::operator=(const Frame<OtherCapacity>& other) {
+template <size_t Capacity, uint8_t Pad>
+template <size_t OtherCapacity, uint8_t OtherPad>
+Frame<Capacity, Pad>& Frame<Capacity, Pad>::operator=(const Frame<OtherCapacity, OtherPad>& other) {
     id_ = other.id();
     ext_ = other.ext();
     if (Capacity < other.size()) {
