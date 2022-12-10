@@ -11,7 +11,8 @@
 namespace Canny {
 
 // CAN implementation for the MCP2517 and MCP2518 controllers.
-class MCP2518 : public Controller {
+template <typename FrameType>
+class MCP2518 : public Controller<FrameType> {
     public:
         MCP2518(uint8_t cs_pin) : mcp_(cs_pin), ready_(false) {}
         ~MCP2518() override = default;
@@ -19,8 +20,8 @@ class MCP2518 : public Controller {
         bool begin(Bitrate bitrate) override;
         Mode mode() const override;
         Bitrate bitrate() const override;
-        Error read(Frame* frame) override;
-        Error write(const Frame& frame) override;
+        Error read(FrameType* frame) override;
+        Error write(const FrameType& frame) override;
     private:
         mcp2518fd mcp_;
         bool ready_;

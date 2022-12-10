@@ -12,7 +12,7 @@
 #if defined(ARDUINO_AVR_LEONARDO)
 #include "Canny/MCP2515.h"
 namespace Canny {
-MCP2515 can_mcp2515(17);
+MCP2515<CAN20Frame> can_mcp2515(17);
 }
 ::Canny::Controller& CAN = ::Canny::can_mcp2515;
 
@@ -20,7 +20,7 @@ MCP2515 can_mcp2515(17);
 #elif defined(ARDUINO_SAMD_VARIANT_COMPLIANCE)
 #include "Canny/SAME51.h"
 namespace Canny {
-SAME51 can_same51;
+SAME51<CANFDFrame> can_same51;
 }
 ::Canny::Controller& CAN = ::Canny::can_same51;
 
@@ -29,8 +29,8 @@ SAME51 can_same51;
 #include "Canny/MCP2518.h"
 #include "Canny/MCP2515.h"
 namespace Canny {
-MCP2518 can_mcp2518(12);
-MCP2515 can_mcp2515(9);
+MCP2518<CANFDFrame> can_mcp2518(12);
+MCP2515<CAN20Frame> can_mcp2515(9);
 }
 ::Canny::Controller& CAN = ::Canny::can_mcp2518;
 ::Canny::Controller& CAN1 = ::Canny::can_mcp2515;

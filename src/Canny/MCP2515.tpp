@@ -57,21 +57,25 @@ uint8_t GetMCP2515Bitrate(Bitrate bitrate) {
 
 }  // namespace
 
-bool MCP2515::begin(Bitrate bitrate) {
+template <typename FrameType>
+bool MCP2515<FrameType>::begin(Bitrate bitrate) {
     bitrate_ = FixMCP2515Bitrate(bitrate);
     ready_ = mcp_.begin(GetMCP2515Bitrate(bitrate_)) == CAN_OK;
     return ready_;
 }
 
-Mode MCP2515::mode() const {
+template <typename FrameType>
+Mode MCP2515<FrameType>::mode() const {
     return CAN20;
 }
 
-Bitrate MCP2515::bitrate() const {
+template <typename FrameType>
+Bitrate MCP2515<FrameType>::bitrate() const {
     return bitrate_;
 }
 
-Error MCP2515::read(Frame* frame) {
+template <typename FrameType>
+Error MCP2515<FrameType>::read(FrameType* frame) {
     if (!ready_) {
         return ERR_READY;
     }
@@ -89,7 +93,8 @@ Error MCP2515::read(Frame* frame) {
     return ERR_OK;
 }
 
-Error MCP2515::write(const Frame& frame) {
+template <typename FrameType>
+Error MCP2515<FrameType>::write(const FrameType& frame) {
     if (!ready_) {
         return ERR_READY;
     }

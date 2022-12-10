@@ -70,27 +70,32 @@ uint32_t GetSAME51Bitrate(Bitrate bitrate) {
 
 }  // namespace
 
-bool SAME51::begin(Bitrate bitrate) {
+template <typename FrameType>
+bool SAME51<FrameType>::begin(Bitrate bitrate) {
     bitrate_ = FixSAME51Bitrate(bitrate);
     mode_ = internal::getMode(bitrate_);
     ready_ = same51_.begin(MCP_ANY, GetSAME51Bitrate(bitrate_), MCAN_MODE_CAN) == CAN_OK;
     return ready_;
 }
 
-Mode SAME51::mode() const {
+template <typename FrameType>
+Mode SAME51<FrameType>::mode() const {
     return mode_;
 }
 
-Bitrate SAME51::bitrate() const {
+template <typename FrameType>
+Bitrate SAME51<FrameType>::bitrate() const {
     return bitrate_;
 }
 
-Error SAME51::read(Frame* frame) {
+template <typename FrameType>
+Error SAME51<FrameType>::read(FrameType* frame) {
     frame->reserve(64);
     return read(frame->mutable_id(), frame->mutable_ext(), frame->data(), frame->mutable_size());
 }
 
-Error SAME51::read(uint32_t* id, uint8_t* ext, uint8_t* data, uint8_t* size) {
+template <typename FrameType>
+Error SAME51<FrameType>::read(uint32_t* id, uint8_t* ext, uint8_t* data, uint8_t* size) {
     if (!ready_) {
         return ERR_READY;
     }
@@ -105,11 +110,13 @@ Error SAME51::read(uint32_t* id, uint8_t* ext, uint8_t* data, uint8_t* size) {
     }
 }
 
-Error SAME51::write(const Frame& frame) {
+template <typename FrameType>
+Error SAME51<FrameType>::write(const FrameType& frame) {
     return write(frame.id(), frame.ext(), frame.data(), frame.size());
 }
 
-Error SAME51::write(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size) {
+template <typename FrameType>
+Error SAME51<FrameType>::write(uint32_t id, uint8_t ext, uint8_t* data, uint8_t size) {
     if (!ready_) {
         return ERR_READY;
     }

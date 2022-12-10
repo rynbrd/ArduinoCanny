@@ -67,7 +67,8 @@ uint32_t GetMCP2518Bitrate(Bitrate bitrate) {
 
 }  // namespace
 
-bool MCP2518::begin(Bitrate bitrate) {
+template <typename FrameType>
+bool MCP2518<FrameType>::begin(Bitrate bitrate) {
     bitrate_ = bitrate;
     mode_ = internal::getMode(bitrate_);
     ready_ = false;
@@ -78,15 +79,18 @@ bool MCP2518::begin(Bitrate bitrate) {
     return ready_;
 }
 
-Mode MCP2518::mode() const {
+template <typename FrameType>
+Mode MCP2518<FrameType>::mode() const {
     return mode_;
 }
 
-Bitrate MCP2518::bitrate() const {
+template <typename FrameType>
+Bitrate MCP2518<FrameType>::bitrate() const {
     return bitrate_;
 }
 
-Error MCP2518::read(Frame* frame) {
+template <typename FrameType>
+Error MCP2518<FrameType>::read(FrameType* frame) {
     if (!ready_) {
         return ERR_READY;
     }
@@ -108,7 +112,8 @@ Error MCP2518::read(Frame* frame) {
     return ERR_OK;
 }
 
-Error MCP2518::write(const Frame& frame) {
+template <typename FrameType>
+Error MCP2518<FrameType>::write(const FrameType& frame) {
     if (!ready_) {
         return ERR_READY;
     }

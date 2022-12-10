@@ -11,7 +11,8 @@
 namespace Canny {
 
 // CAN implementation for MCP2515 controller.
-class MCP2515 : public Controller {
+template <typename FrameType>
+class MCP2515 : public Controller<FrameType> {
     public:
         // Construct a new MCP2515 CAN object that uses the given CS pin.
         MCP2515(uint8_t cs_pin) : mcp_(cs_pin), ready_(false) {}
@@ -20,8 +21,8 @@ class MCP2515 : public Controller {
         bool begin(Bitrate bitrate) override;
         Mode mode() const override;
         Bitrate bitrate() const override;
-        Error read(Frame* frame) override;
-        Error write(const Frame& frame) override;
+        Error read(FrameType* frame) override;
+        Error write(const FrameType& frame) override;
     private:
         MCP_CAN mcp_;
         bool ready_;
