@@ -67,6 +67,11 @@ void Frame<Capacity, Pad>::clear() {
 }
 
 template <size_t Capacity, uint8_t Pad>
+void Frame<Capacity, Pad>::clear(uint8_t fill) {
+    memset(data_, fill, Capacity);
+}
+
+template <size_t Capacity, uint8_t Pad>
 size_t Frame<Capacity, Pad>::printTo(Print& p) const {
     size_t n = 0;
     if (ext()) {

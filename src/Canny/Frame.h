@@ -98,6 +98,9 @@ class Frame : public Printable {
         // size does not change.
         void clear();
 
+        // Clear the frame data and fill it with the given byte.
+        void clear(uint8_t fill);
+
         // Write a human readable string representation of the frame to a
         // print object. Return the number of bytes written. Implements
         // Printable.
