@@ -79,7 +79,6 @@ Error MCP2515<FrameType>::read(FrameType* frame) {
     if (!ready_) {
         return ERR_READY;
     }
-    frame->reserve(8);
 
     switch (mcp_.readMsgBufID(frame->mutable_id(), frame->mutable_size(), frame->data())) {
         case CAN_OK:

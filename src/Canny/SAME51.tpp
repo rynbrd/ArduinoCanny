@@ -90,7 +90,6 @@ Bitrate SAME51<FrameType>::bitrate() const {
 
 template <typename FrameType>
 Error SAME51<FrameType>::read(FrameType* frame) {
-    frame->reserve(64);
     return read(frame->mutable_id(), frame->mutable_ext(), frame->data(), frame->mutable_size());
 }
 

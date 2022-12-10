@@ -95,12 +95,6 @@ Error MCP2518<FrameType>::read(FrameType* frame) {
         return ERR_READY;
     }
 
-    if (mode_ == CAN20) {
-        frame->reserve(8);
-    } else {
-        frame->reserve(64);
-    }
-
     if (mcp_.checkReceive() != CAN_MSGAVAIL) {
         return ERR_FIFO;
     }
