@@ -1,6 +1,5 @@
 #ifndef _CANNY_MCP2515_H_
 #define _CANNY_MCP2515_H_
-#pragma message("Including MCP2515 CAN Controller Support")
 
 // This controller requires the Longan MCP2515 library to build:
 // https://github.com/Longan-Labs/Aruino_CAN_BUS_MCP2515

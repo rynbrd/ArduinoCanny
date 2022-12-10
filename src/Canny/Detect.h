@@ -10,6 +10,7 @@
 
 // CANBed V1
 #if defined(ARDUINO_AVR_LEONARDO)
+#pragma message("Including MCP2515 CAN Controller Support")
 #include "Canny/MCP2515.h"
 namespace Canny {
 MCP2515<CAN20Frame> can_mcp2515(17);
@@ -18,6 +19,7 @@ MCP2515<CAN20Frame> can_mcp2515(17);
 
 // CANBed M4
 #elif defined(ARDUINO_SAMD_VARIANT_COMPLIANCE)
+#pragma message("Including SAME51 CAN Controller Support")
 #include "Canny/SAME51.h"
 namespace Canny {
 SAME51<CANFDFrame> can_same51;
@@ -26,7 +28,9 @@ SAME51<CANFDFrame> can_same51;
 
 // CANBed RP2040 and Dual.
 #elif defined(RASPBERRYPI_PICO)
+#pragma message("Including MCP2518 CAN Controller Support")
 #include "Canny/MCP2518.h"
+#pragma message("Including MCP2515 CAN Controller Support")
 #include "Canny/MCP2515.h"
 namespace Canny {
 MCP2518<CANFDFrame> can_mcp2518(12);

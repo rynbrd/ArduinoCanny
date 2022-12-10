@@ -1,6 +1,5 @@
 #ifndef _CANNY_MCP2518_H_
 #define _CANNY_MCP2518_H_
-#pragma message("Including MCP2518 CAN Controller Support")
 
 // This requires the Longan CANFD library to build:
 // https://github.com/Longan-Labs/Longan_CANFD

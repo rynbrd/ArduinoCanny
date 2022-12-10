@@ -1,6 +1,5 @@
 #ifndef _CANNY_SAME51_H_
 #define _CANNY_SAME51_H_
-#pragma message("Including SAME51 CAN Controller Support")
 
 #include <same51_can.h>
 #include "Controller.h"
