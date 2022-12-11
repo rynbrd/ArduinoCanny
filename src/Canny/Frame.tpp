@@ -6,25 +6,9 @@ Frame<Capacity, Pad>::Frame() : id_(0), ext_(0), size_(0) {
 }
 
 template <size_t Capacity, uint8_t Pad>
-Frame<Capacity, Pad>::Frame(uint8_t size) :
-        id_(0), ext_(0), size_(size) {
-    memset(data_, pad_, Capacity);
-}
-
-template <size_t Capacity, uint8_t Pad>
 Frame<Capacity, Pad>::Frame(uint32_t id, uint8_t ext, uint8_t size) :
         id_(id), ext_(ext), size_(size) {
     memset(data_, pad_, Capacity);
-}
-
-template <size_t Capacity, uint8_t Pad>
-template <size_t N> 
-Frame<Capacity, Pad>::Frame(uint32_t id, uint8_t ext, const uint8_t (&data)[N]) :
-        id_(id), ext_(ext), size_(min(Capacity, N)) {
-    for (size_t i = 0; i < size_; i++) {
-        data_[i] = data[i];
-    }
-    memset(data_+size_, pad_, Capacity-size_);
 }
 
 template <size_t Capacity, uint8_t Pad>
@@ -95,7 +79,7 @@ size_t Frame<Capacity, Pad>::printTo(Print& p) const {
 
 template <size_t Capacity, uint8_t Pad>
 template <size_t OtherCapacity, uint8_t OtherPad>
-Frame<Capacity, Pad>& Frame<Capacity, Pad>::operator=(const Frame<OtherCapacity, OtherPad>& other) {
+void Frame<Capacity, Pad>::copyFrom(const Frame<OtherCapacity, OtherPad>& other) {
     id_ = other.id();
     ext_ = other.ext();
     if (Capacity < other.size()) {
@@ -104,7 +88,34 @@ Frame<Capacity, Pad>& Frame<Capacity, Pad>::operator=(const Frame<OtherCapacity,
         size_ = other.size();
     }
     memcpy(data_, other.data(), size_);
-    return *this;
+}
+
+template <size_t N> 
+CAN20Frame::CAN20Frame(uint32_t id, uint8_t ext, const uint8_t (&buf)[N]) :
+        Frame(id, ext, 0) {
+    if (N < capacity()) {
+        resize(N);
+    } else {
+        resize(capacity());
+    }
+    for (size_t i = 0; i < size(); i++) {
+        data()[i] = buf[i];
+    }
+    memset(data()+size(), pad(), capacity()-size());
+}
+
+template <size_t N> 
+CANFDFrame::CANFDFrame(uint32_t id, uint8_t ext, const uint8_t (&buf)[N]) :
+        Frame(id, ext, 0) {
+    if (N < capacity()) {
+        resize(N);
+    } else {
+        resize(capacity());
+    }
+    for (size_t i = 0; i < size(); i++) {
+        data()[i] = buf[i];
+    }
+    memset(data()+size(), pad(), capacity()-size());
 }
 
 template <size_t LeftCapacity, uint8_t LeftPad, size_t RightCapacity, uint8_t RightPad>

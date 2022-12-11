@@ -142,7 +142,7 @@ class J1939Message : public Frame<8, 0xFF> {
         // Write a human readable string representation of the J1939 message to
         // a print object. Return the number of bytes written. Implements
         // Printable.
-        size_t printTo(Print& p) const override;
+        size_t printTo(Print& p) const;
 };
 
 }  // namespace Canny

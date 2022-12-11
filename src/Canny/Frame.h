@@ -13,33 +13,17 @@ namespace Canny {
 // CanFD this is 64 bytes. Newly allocated and unused capacity is padded with a
 // given pad byte.
 template <size_t Capacity, uint8_t Pad = 0x00>
-class Frame : public Printable {
-    public:
-        static constexpr size_t capacity = Capacity;
-
+class Frame {
+    protected:
         // Construct an empty frame.
         Frame();
-
-        // Construct an empty frame with the specified size. The size is
-        // truncated to the frame's capacity and the frame's data is filled
-        // with the pad byte.
-        explicit Frame(uint8_t size);
 
         // Construct a CAN frame with the provided values and size. The size is
         // truncated to the frame's capacity and the frame's data is filled
         // with the pad byte.
         Frame(uint32_t id, uint8_t ext, uint8_t size);
 
-        // Construct a CAN frame with the provided values and data. Data is
-        // truncated to the frame's capacity and the size is set to the
-        // resulting data length. Any remaining capacity is filled with pad
-        // bytes.
-        template <size_t N> 
-        Frame(uint32_t id, uint8_t ext, const uint8_t (&data)[N]);
-
-        // Defaults destructor.
-        virtual ~Frame() = default;
-
+    public:
         // Return the ID of the frame. This is an 11-bit value for standard
         // frames and a 29-bit value for extended frames.
         uint32_t id() const { return id_; }
@@ -64,8 +48,15 @@ class Frame : public Printable {
         // Return the length of the frame's data in bytes.
         uint8_t size() const { return size_; }
 
-        // Return a pointer to the frame's data. The data is mutable and is
-        // exactly capacity() bytes long. Never returns a nullptr.
+        // Return the maximum capacity of the frame's data payload.
+        uint8_t capacity() const { return capacity_; }
+
+        // Return the byte used to pad empty payload capacity.
+        uint8_t pad() const { return pad_; }
+
+        // Return a pointer to the frame's payload data. The data is mutable
+        // and is exactly capacity() bytes long. Always returns a valid
+        // pointer.
         uint8_t* data() const { return (uint8_t*)data_; }
 
         // Set the data from the provided initializer list. Data is truncated
@@ -104,13 +95,13 @@ class Frame : public Printable {
         // Write a human readable string representation of the frame to a
         // print object. Return the number of bytes written. Implements
         // Printable.
-        size_t printTo(Print& p) const override;
+        size_t printTo(Print& p) const;
 
-        // Copy the contents of one frame to another. If the destination frame
-        // does not have the capacity to store the source's data then the data
-        // is truncated to fit.
+        // Copy the contents of another frame into this one. If this frame does
+        // not have the capacity to store the source's data then the data is
+        // truncated to fit.
         template <size_t OtherCapacity, uint8_t OtherPad>
-        Frame<Capacity, Pad>& operator=(const Frame<OtherCapacity, OtherPad>& frame);
+        void copyFrom(const Frame<OtherCapacity, OtherPad>& frame);
     private:
         // The ID of the frame. This is an 11-bit value for standard frames and
         // a 29-bit value for extended frames.
@@ -122,8 +113,48 @@ class Frame : public Printable {
         // The data transmitted with this frame.
         uint8_t data_[Capacity];
 
+        // The size of data_ in bytes.
+        static constexpr uint8_t capacity_ = Capacity;
         // The byte to pad extra capacity with.
         static constexpr uint8_t pad_ = Pad;
+};
+
+// A CAN 2.0 frame.
+class CAN20Frame : public Frame<8, 0x00> {
+    public:
+        // Construct an empty frame with ID 0, ext false, and size 0.
+        CAN20Frame() : Frame() {}
+
+        // Construct a CAN frame with the provided values and size. The size is
+        // truncated to the frame's capacity and the frame's data is filled
+        // with 0x00.
+        CAN20Frame(uint32_t id, uint8_t ext, uint8_t size) :
+            Frame(id, ext, size) {}
+
+        // Construct a CAN frame with the provided values and data. Data is
+        // truncated to the frame's capacity and the size is set to the
+        // resulting data length. Any remaining capacity is filled with 0x00.
+        template <size_t N> 
+        CAN20Frame(uint32_t id, uint8_t ext, const uint8_t (&data)[N]);
+};
+
+// A CAN FD frame.
+class CANFDFrame : public Frame<64, 0x00> {
+    public:
+        // Construct an empty frame with ID 0, ext false, and size 0.
+        CANFDFrame() : Frame() {}
+
+        // Construct a CAN frame with the provided values and size. The size is
+        // truncated to the frame's capacity and the frame's data is filled
+        // with 0x00.
+        CANFDFrame(uint32_t id, uint8_t ext, uint8_t size) :
+            Frame(id, ext, size) {}
+
+        // Construct a CAN frame with the provided values and data. Data is
+        // truncated to the frame's capacity and the size is set to the
+        // resulting data length. Any remaining capacity is filled with 0x00.
+        template <size_t N> 
+        CANFDFrame(uint32_t id, uint8_t ext, const uint8_t (&data)[N]);
 };
 
 // Return true if the values of two frames are equal. The id, ext, size, and
@@ -136,9 +167,6 @@ bool operator==(const Frame<LeftCapacity, LeftPad>& left, const Frame<RightCapac
 // Equivalent to !(left == right).
 template <size_t LeftCapacity, uint8_t LeftPad, size_t RightCapacity, uint8_t RightPad>
 bool operator!=(const Frame<LeftCapacity, LeftPad>& left, const Frame<RightCapacity, RightPad>& right);
-
-typedef Frame<8, 0x00> CAN20Frame;
-typedef Frame<64, 0x00> CANFDFrame;
 
 }  // namespace Canny
 

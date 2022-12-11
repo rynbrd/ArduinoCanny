@@ -109,7 +109,8 @@ class TestConnection : public BufferedConnection<CAN20Frame> {
             Serial.print("write error: ");
             Serial.println(err);
             Serial.print("discard frame: ");
-            Serial.println(frame);
+            frame.printTo(Serial);
+            Serial.println();
         }
 };
 
