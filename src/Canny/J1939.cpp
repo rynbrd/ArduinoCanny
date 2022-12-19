@@ -1,8 +1,8 @@
 #include "J1939.h"
 
 #include <Arduino.h>
+#include <ByteOrder.h>
 #include <Canny.h>
-#include <Endian.h>
 
 namespace Canny {
 namespace {
@@ -61,14 +61,14 @@ J1939Message::J1939Message(uint32_t pgn, uint8_t sa, uint8_t da, uint8_t priorit
 
 void J1939Message::name(uint64_t name) {
     resize(8);
-    Endian::hlltonb(data(), name);
+    ByteOrder::hlltonb(data(), name);
 }
 
 uint64_t J1939Message::name() const {
     if (size() < 8) {
         return 0;
     }
-    return Endian::nbtohll(data());
+    return ByteOrder::nbtohll(data());
 }
 
 uint8_t J1939Message::priority() const {
