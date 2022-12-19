@@ -62,7 +62,7 @@ class Frame {
         // Set the data from the provided initializer list. Data is truncated
         // to Capacity and the frame's size is set to the resulting length.
         template <size_t N> 
-        void data(const int (&data)[N]);
+        void data(const uint8_t (&data)[N]);
 
         // Set the data from the provided buffer. Data is truncated to Capacity
         // and the frame's size is set to the resulting length.
@@ -135,7 +135,7 @@ class CAN20Frame : public Frame<8, 0x00> {
         // truncated to the frame's capacity and the size is set to the
         // resulting data length. Any remaining capacity is filled with 0x00.
         template <size_t N> 
-        CAN20Frame(uint32_t id, uint8_t ext, const int (&data)[N]);
+        CAN20Frame(uint32_t id, uint8_t ext, const uint8_t (&data)[N]);
 };
 
 // A CAN FD frame.
@@ -154,7 +154,7 @@ class CANFDFrame : public Frame<64, 0x00> {
         // truncated to the frame's capacity and the size is set to the
         // resulting data length. Any remaining capacity is filled with 0x00.
         template <size_t N> 
-        CANFDFrame(uint32_t id, uint8_t ext, const int (&data)[N]);
+        CANFDFrame(uint32_t id, uint8_t ext, const uint8_t (&data)[N]);
 };
 
 // Return true if the values of two frames are equal. The id, ext, size, and
