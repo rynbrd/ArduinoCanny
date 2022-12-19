@@ -28,9 +28,9 @@ void Frame<Capacity, Pad>::data(const uint8_t* data, uint8_t len) {
 
 template <size_t Capacity, uint8_t Pad>
 template <size_t N> 
-void Frame<Capacity, Pad>::data(const uint8_t (&data)[N]) {
-    resize(sizeof(data));
-    for (size_t i = 0; i < sizeof(data); i++) {
+void Frame<Capacity, Pad>::data(const int (&data)[N]) {
+    resize(N);
+    for (size_t i = 0; i < N; i++) {
         data_[i] = data[i];
     }
 }
@@ -91,7 +91,7 @@ void Frame<Capacity, Pad>::copyFrom(const Frame<OtherCapacity, OtherPad>& other)
 }
 
 template <size_t N> 
-CAN20Frame::CAN20Frame(uint32_t id, uint8_t ext, const uint8_t (&buf)[N]) :
+CAN20Frame::CAN20Frame(uint32_t id, uint8_t ext, const int (&buf)[N]) :
         Frame(id, ext, 0) {
     if (N < capacity()) {
         resize(N);
@@ -105,7 +105,7 @@ CAN20Frame::CAN20Frame(uint32_t id, uint8_t ext, const uint8_t (&buf)[N]) :
 }
 
 template <size_t N> 
-CANFDFrame::CANFDFrame(uint32_t id, uint8_t ext, const uint8_t (&buf)[N]) :
+CANFDFrame::CANFDFrame(uint32_t id, uint8_t ext, const int (&buf)[N]) :
         Frame(id, ext, 0) {
     if (N < capacity()) {
         resize(N);
