@@ -7,10 +7,11 @@
 #define assertFramesEqual(left, right) do { \
     if (left != right) { \
         SERIAL_PORT_MONITOR.print(left.ext() ? "(E)" : "(S)"); \
-        SERIAL_PORT_MONITOR.print(left); \
+        left.printTo(SERIAL_PORT_MONITOR); \
         SERIAL_PORT_MONITOR.print(" != "); \
         SERIAL_PORT_MONITOR.print(right.ext() ? "(E)" : "(S)"); \
-        SERIAL_PORT_MONITOR.println(right); \
+        right.printTo(SERIAL_PORT_MONITOR); \
+        SERIAL_PORT_MONITOR.println(); \
         assertTrue(false); \
     } \
 } while (false)
