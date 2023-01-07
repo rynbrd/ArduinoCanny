@@ -1,8 +1,8 @@
 #ifndef _CANNY_MCP2518_H_
 #define _CANNY_MCP2518_H_
 
-// This requires the Longan CANFD library to build:
-// https://github.com/Longan-Labs/Longan_CANFD
+// This controller requires the MCP2518 library to build:
+// https://github.com/bluedragonx/ArduinoMCP2518
 
 #include <mcp2518fd_can.h>
 #include "Controller.h"

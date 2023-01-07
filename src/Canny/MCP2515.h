@@ -1,8 +1,8 @@
 #ifndef _CANNY_MCP2515_H_
 #define _CANNY_MCP2515_H_
 
-// This controller requires the Longan MCP2515 library to build:
-// https://github.com/Longan-Labs/Aruino_CAN_BUS_MCP2515
+// This controller requires the MCP2515 library to build:
+// https://github.com/bluedragonx/ArduinoMCP2515
 
 #include <mcp_can.h>
 #include "Controller.h"
