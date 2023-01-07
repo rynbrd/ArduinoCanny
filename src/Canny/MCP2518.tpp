@@ -125,4 +125,21 @@ Error MCP2518<FrameType>::write(const FrameType& frame) {
     return ERR_INTERNAL;
 }
 
+template <typename FrameType>
+void MCP2518<FrameType>::setFilter(uint8_t num, uint8_t ext, uint32_t filter, uint32_t mask) {
+    mcp_.init_Filt_Mask(num, ext, filter, mask);
+}
+
+template <typename FrameType>
+void MCP2518<FrameType>::clearFilter(uint8_t num) {
+    mcp_.CANFDSPI_FilterDisable((CAN_FILTER)num);
+}
+
+template <typename FrameType>
+void MCP2518<FrameType>::disableFilters() {
+    for (uint8_t i = 0; i < 32; ++i) {
+        clearFilter(i);
+    }
+}
+
 }  // namespace Canny

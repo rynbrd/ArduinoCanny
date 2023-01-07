@@ -21,6 +21,17 @@ class MCP2518 : public Controller<FrameType> {
         Bitrate bitrate() const override;
         Error read(FrameType* frame) override;
         Error write(const FrameType& frame) override;
+
+        // Enable a read filter on the controller. The controller has 32
+        // available filters. Frames whose ID does not match one of the filters
+        // is discarded. Filtering is enabled if any filter is set.
+        void setFilter(uint8_t num, uint8_t ext, uint32_t filter, uint32_t mask);
+
+        // Clear a filter.
+        void clearFilter(uint8_t num);
+
+        // Clear all filters so that all frames are read.
+        void disableFilters(); 
     private:
         mcp2518fd mcp_;
         bool ready_;
