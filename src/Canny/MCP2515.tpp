@@ -112,4 +112,24 @@ Error MCP2515<FrameType>::write(const FrameType& frame) {
     }
 }
 
+template <typename FrameType>
+void MCP2515<FrameType>::setMask(uint8_t num, uint8_t ext, uint32_t mask) {
+    mcp_.init_Mask(num, ext, mask);
+}
+
+template <typename FrameType>
+void MCP2515<FrameType>::setFilter(uint8_t num, uint8_t ext, uint32_t filter) {
+    mcp_.init_Filt(num, ext, filter);
+}
+
+template <typename FrameType>
+void MCP2515<FrameType>::disableFilters() {
+    for (uint8_t i = 0; i < 2; ++i) {
+        setMask(i, 0, 0);
+    }
+    for (uint8_t i = 0; i < 6; ++i) {
+        setFilter(i, 0, 0);
+    }
+}
+
 }  // namespace Canny

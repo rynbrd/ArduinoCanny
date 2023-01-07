@@ -22,6 +22,18 @@ class MCP2515 : public Controller<FrameType> {
         Bitrate bitrate() const override;
         Error read(FrameType* frame) override;
         Error write(const FrameType& frame) override;
+
+        // Set a mask on the controller. The MCP2515 has two masks. Mask 0
+        // applies to filters 0-1. Mask 1 applies to filters 2-5. Filtering is
+        // enabled if any mask is set.
+        void setMask(uint8_t num, uint8_t ext, uint32_t mask);
+
+        // Set a filter on the controller. The MCP2515 has six filters assigned
+        // to the two masks. See setMask for the mask/filter assignment.
+        void setFilter(uint8_t num, uint8_t ext, uint32_t filter);
+
+        // Clear masks and filters so that all frames are read.
+        void disableFilters();
     private:
         MCP_CAN mcp_;
         bool ready_;
