@@ -27,7 +27,7 @@ SAME51<CANFDFrame> can_same51;
 ::Canny::Controller& CAN = ::Canny::can_same51;
 
 // CANBed RP2040 and Dual.
-#elif defined(PICO_RP2040)
+#elif defined(PICO_RP2040) || defined(ARDUINO_RASPBERRY_PI_PICO)
 #pragma message("Including MCP2518 CAN Controller Support")
 #include "Canny/MCP2518.h"
 #pragma message("Including MCP2515 CAN Controller Support")
