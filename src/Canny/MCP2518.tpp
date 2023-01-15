@@ -98,7 +98,7 @@ Error MCP2518<FrameType>::read(FrameType* frame) {
     if (mcp_.checkReceive() != CAN_MSGAVAIL) {
         return ERR_FIFO;
     }
-    if (mcp_.readMsgBuf(frame->mutable_size(), frame->data()) != CAN_OK) {
+    if (mcp_.readMsgBuf(frame->mutable_size(), frame->data(), frame->capacity()) != CAN_OK) {
         return ERR_INTERNAL;
     }
     frame->id(mcp_.getCanId());
