@@ -39,7 +39,7 @@ Error RealDash<FrameType>::read(FrameType* frame) {
 template <typename FrameType>
 bool RealDash<FrameType>::readHeader() {
     byte b;
-    while (stream_->available() && read_size_ < 4) {
+    while (read_size_ < 4 && stream_->available()) {
         b = stream_->read();
         read_size_++;
         switch (read_size_) {
@@ -84,7 +84,7 @@ bool RealDash<FrameType>::readHeader() {
 template <typename FrameType>
 bool RealDash<FrameType>::readId() {
     uint32_t b;
-    while (stream_->available() && read_size_ < 8) {
+    while (read_size_ < 8 && stream_->available()) {
         b = stream_->read();
         read_size_++;
         updateChecksum(b);
@@ -108,7 +108,7 @@ bool RealDash<FrameType>::readId() {
 
 template <typename FrameType>
 bool RealDash<FrameType>::readData() {
-    while (stream_->available() && read_size_ - 8 < frame_.size()) {
+    while (read_size_ - 8 < frame_.size() && stream_->available()) {
         frame_.data()[read_size_-8] = stream_->read();
         updateChecksum(frame_.data()[read_size_-8]);
         read_size_++;
@@ -120,7 +120,7 @@ bool RealDash<FrameType>::readData() {
 template <typename FrameType>
 bool RealDash<FrameType>::validateChecksum() {
     if (frame_type_66_) {
-        while (stream_->available() && read_size_ - 8 - frame_.size() < 4) {
+        while (read_size_ - 8 - frame_.size() < 4 && stream_->available()) {
             checksum_buffer_[read_size_ - 8 - frame_.size()] = stream_->read();
             read_size_++;
         }
